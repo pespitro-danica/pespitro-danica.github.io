@@ -1,15 +1,37 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-  <meta charset="UTF-8">
-  <title>Fitness Tracker</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" conent="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <header>
+      <h1>Fitness Tracker</h1>
+      <p><Hi, welcome to the Fitness Tracker Website./p>
+      <ul><a href="https://github.com/pespitro-danica/pespitro-danica.github.io">Link for Github</a></ul>
 
-  <h1>Fitness Tracker</h1>
-  <p><Hi, welcome to the Fitness Tracker Website./p>
-  <ul><a href="https://github.com/pespitro-danica/pespitro-danica.github.io">Link for Github</a></ul>
+  </header>
+
+  <main>
+      <section class="tracker-form">
+        <h2>Add Workout</h2>
+        <form id="workoutform">
+            <label for="type">Exercise Type:</label>
+            <input type="text" id="type" placeholder="Running" required>
+
+            <label for="duration">Duration (mins):</label>
+            <input type="number" id="duration" placeholder="30" required>
+
+            <label for="calories">Calories Burned:</label>
+            <input type="number" id="calories" placeholder="250" required>
+
+            <button type="submit">Add Workout</button>
+        </form>
+    </section
+
+  </main>
 
 </body>
 </html>
