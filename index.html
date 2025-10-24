@@ -31,7 +31,35 @@
         </form>
     </section
 
+    <sectiom class="tracker-list">
+        <h2>Workout Log</h2>
+        <ul id="workoutlist"></u>
+    </section>
+
   </main>
+
+  <footer>
+        <p>2025 Fitness Tracker by Danica Pespitro</p>
+  </footer>
+
+  <script>
+        const form = document.getElementById('workoutForm');
+        const list = document.getElementById('workoutList');
+
+        form.addEventListener('submit', function(event) {
+              event.preventDefault();
+
+              const type = document.getElementById('type').value;
+              const duration = document.getElementById('duration').value;
+              const calories = document.getElementById('calories').value;
+
+              const listItem = document.createElement('li');
+              listItem.textContent = `${type} - ${duration} mins - ${calories} kcal`;
+              list.appendChild(listItem);
+
+              form.reset();
+        });
+  </script>
 
 </body>
 </html>
