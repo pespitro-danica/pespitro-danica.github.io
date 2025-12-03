@@ -6,6 +6,7 @@ body {
     padding: 0;
 }
 
+/* -------- HEADER -------- */
 header {
     background: white;
     padding: 15px 25px;
@@ -13,13 +14,18 @@ header {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #e3e8f0;
+
+    /* Prevent header from going under sidebar */
     margin-left: 200px;
 }
 
 .logo {
     margin: 0;
-    font-size: 24px;
+    font-size: 28px;
+    font-weight: 900;
     color: #1b2a4e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .header-btn {
@@ -30,6 +36,7 @@ header {
     margin-left: 10px;
     border-radius: 8px;
     cursor: pointer;
+    transition: 0.3s;
 }
 
 .header-btn:hover {
@@ -57,6 +64,7 @@ header {
     padding: 14px;
     cursor: pointer;
     transition: 0.3s;
+    font-size: 16px;
 }
 
 .sidebar li:hover {
@@ -73,7 +81,7 @@ header {
 
 /* ---------- CONTENT AREA ---------- */
 #content {
-    margin-left: 220px;
+    margin-left: 220px; /* matches sidebar width + spacing */
     margin-top: 20px;
     padding: 25px;
     background: white;
@@ -87,8 +95,10 @@ header {
     display: none;
     position: fixed;
     z-index: 50;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(0,0,0,0.5);
 }
 
@@ -129,6 +139,7 @@ button {
     padding: 20px;
     border-radius: 12px;
     text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
 .card-number {
@@ -141,7 +152,8 @@ button {
     background: #fff7e6;
     padding: 15px;
     border-left: 5px solid #ffa726;
-    border-radius: 8px;
+    border-radius: 10px;
+    margin-top: 15px;
 }
 
 /* ---------- PROFILE ---------- */
@@ -150,6 +162,7 @@ button {
     padding: 20px;
     border-radius: 12px;
     max-width: 450px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
 .profile-box label,
@@ -169,10 +182,20 @@ button {
     font-weight: bold;
     border-radius: 8px;
     margin-top: 20px;
+    transition: 0.3s;
+}
+
+.profile-box button:hover,
+.settings-box button:hover {
+    background: #1e4fd3;
 }
 
 .cancel-btn {
     background: #999;
+}
+
+.cancel-btn:hover {
+    background: #777;
 }
 
 .height-row {
@@ -180,7 +203,15 @@ button {
     gap: 10px;
 }
 
-/* ---------- TRAINING LOG TABLE ---------- */
+/* ---------- TRAINING LOG ---------- */
+.log-form {
+    background: #eef3ff;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 480px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
 .workout-table {
     width: 100%;
     border-collapse: collapse;
@@ -197,10 +228,30 @@ button {
     border: none;
     border-radius: 6px;
     color: white;
+    cursor: pointer;
 }
 
-.editBtn { background: #1976d2; }
-.deleteBtn { background: #d32f2f; }
+.editBtn {
+    background: #1976d2;
+}
 
-.editBtn:hover { background: #145cab; }
-.deleteBtn:hover { background: #b32525; }
+.editBtn:hover {
+    background: #135ba8;
+}
+
+.deleteBtn {
+    background: #d32f2f;
+}
+
+.deleteBtn:hover {
+    background: #b12525;
+}
+
+/* ---------- WORKOUT PLAN ---------- */
+.plan-box {
+    background: #eef3ff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    max-width: 600px;
+}
