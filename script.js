@@ -8,6 +8,9 @@ let dashboardRange = "week";
 let profileEditing = false;
 // Calendar month offset from current month
 let calendarMonthOffset = 0;
+// Allows app to store multi-user storage
+let currentUser = localStorage.getItem("loggedInUser") || "";
+
 
 // Helper: capitalize / pretty name for types
 function formatType(type) {
@@ -124,10 +127,17 @@ const accountSettingsNav = document.getElementById("accountSettingsNav");
 
 loginBtn.onclick = () => {
     loginModal.style.display = "block";
+    document.getElementById("loginEmail").value = "";
+    document.getElementById("loginPassword").value = "";
+
 };
 
 createBtn.onclick = () => {
     createModal.style.display = "block";
+    document.getElementById("regName").value = "";
+    document.getElementById("regEmail").value = "";
+    document.getElementById("regPassword").value = "";
+
 };
 
 closeBtns.forEach(btn => {
@@ -141,9 +151,17 @@ closeBtns.forEach(btn => {
     };
 });
 
-if (!localStorage.getItem("loggedIn")) {
+
+if (!localStorage.getItem("loggedIn") || !localStorage.getItem("loggedInUser")) {
     document.querySelectorAll(".sidebar li").forEach(item => {
         item.style.pointerEvents = "none";
+        item.style.opacity = "0.5";
+    });
+} else {
+    // Enable sidebar if user is logged in and active
+    document.querySelectorAll(".sidebar li").forEach(item => {
+        item.style.pointerEvents = "auto";
+        item.style.opacity = "1";
     });
 }
 
@@ -158,25 +176,37 @@ createAccountSubmit.onclick = () => {
         return;
     }
 
-    localStorage.setItem("userName", name);
-    localStorage.setItem("userEmail", email);
-    localStorage.setItem("userPassword", password);
+    localStorage.setItem(email + "_userName", name);
+    localStorage.setItem(email + "_userEmail", email);
+    localStorage.setItem(email + "_userPassword", password);
 
+    localStorage.setItem("pendingEmail", email);
     createModal.style.display = "none";
     goalModal.style.display = "block";
 };
 
 /* ---------- CREATE ACCOUNT: STEP 2 ---------- */
 goalNext.onclick = () => {
+    const email = localStorage.getItem("pendingEmail");
     const goal = document.getElementById("goalSelect").value;
-    localStorage.setItem("userGoal", goal);
+    localStorage.setItem(email + "_userGoal", goal);
+
+    localStorage.setItem("pendingEmail", email);
 
     goalModal.style.display = "none";
     statsModal.style.display = "block";
+
+    document.getElementById("userHeightFeet").value = "";
+    document.getElementById("userHeightInches").value = "";
+    document.getElementById("userWeightLbs").value = "";
+    document.getElementById("regWeightGoal").value = "";
+    document.getElementById("userAge").value = "";
+
 };
 
 /* ---------- CREATE ACCOUNT: STEP 3 ---------- */
 finishSetup.onclick = () => {
+    const email = localStorage.getItem("pendingEmail");
     const feet = document.getElementById("userHeightFeet").value;
     const inches = document.getElementById("userHeightInches").value;
     const weight = document.getElementById("userWeightLbs").value;
@@ -190,21 +220,23 @@ finishSetup.onclick = () => {
 
     const totalHeight = Number(feet) * 12 + Number(inches);
 
-    localStorage.setItem("userHeightInches", totalHeight);
-    localStorage.setItem("userWeightLbs", weight);
-    localStorage.setItem("userWeightGoal", goalWeight);
-    localStorage.setItem("userAge", age);
+    localStorage.setItem(email + "_userHeightInches", totalHeight);
+    localStorage.setItem(email + "_userWeightLbs", weight);
+    localStorage.setItem(email + "_userWeightGoal", goalWeight);
+    localStorage.setItem(email + "_userAge", age);
 
-    // Initialize weight history
     const history = [{
         date: new Date().toISOString().split("T")[0],
         weight: Number(weight)
     }];
-    localStorage.setItem("weightHistory", JSON.stringify(history));
+    localStorage.setItem(email + "_weightHistory", JSON.stringify(history));
+
 
     statsModal.style.display = "none";
     showWelcome();
     loadPage("Dashboard");
+
+    localStorage.removeItem("pendingEmail");
 };
 
 /* ---------- LOGIN HANDLER ---------- */
@@ -212,11 +244,15 @@ loginSubmit.onclick = () => {
     const email = document.getElementById("loginEmail").value;
     const pass = document.getElementById("loginPassword").value;
 
-    const storedEmail = localStorage.getItem("userEmail");
-    const storedPass = localStorage.getItem("userPassword");
+    const storedEmail = localStorage.getItem(email + "_userEmail");
+    const storedPass = localStorage.getItem(email + "_userPassword");
+
 
     if (email === storedEmail && pass === storedPass) {
         localStorage.setItem("loggedIn", "true");
+        localStorage.setItem("loggedInUser", email);
+        currentUser = email;
+
 
         document.querySelectorAll(".sidebar li").forEach(item => {
           item.style.pointerEvents = "auto";
@@ -235,6 +271,9 @@ loginSubmit.onclick = () => {
 logoutBtn.onclick = () => {
     // Remove login flag
     localStorage.removeItem("loggedIn");
+    localStorage.removeItem("loggedInUser");
+    currentUser = "";
+
 
     // Disable sidebar navigation
     document.querySelectorAll(".sidebar li").forEach(item => {
@@ -258,7 +297,8 @@ logoutBtn.onclick = () => {
 
 /* ---------- WELCOME DISPLAY ---------- */
 function showWelcome() {
-    const name = localStorage.getItem("userName");
+    const name = localStorage.getItem(currentUser + "_userName");
+
 
     if (name) {
         welcomeMsg.textContent = "Hi, " + name;
@@ -276,10 +316,10 @@ function showWelcome() {
 navItems.forEach(item => {
     item.addEventListener("click", () => {
 
-        if (!localStorage.getItem("userName")) {
+      if (!localStorage.getItem(currentUser + "_userName")) {
             alert("Please log in first.");
             return;
-        }
+      }
 
         navItems.forEach(i => i.classList.remove("active"));
         item.classList.add("active");
@@ -306,7 +346,7 @@ loadPageWelcome();
 --------------------------- */
 
 function loadPage(page) {
-    if (!localStorage.getItem("userName")) {
+    if (!localStorage.getItem(currentUser + "_userName")) {
         loadPageWelcome();
         return;
     }
@@ -323,7 +363,8 @@ function loadPage(page) {
 --------------------------- */
 
 function getDashboardStats(range) {
-    const workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
+    const workouts = JSON.parse(localStorage.getItem(currentUser + "_workouts") || "[]");
+
     const now = new Date();
     let start, end;
 
@@ -365,7 +406,8 @@ function getDashboardStats(range) {
 --------------------------- */
 
 function loadDashboard() {
-    const workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
+    const workouts = JSON.parse(localStorage.getItem(currentUser + "_workouts") || "[]");
+
     const lastWorkout = workouts.length ? workouts[workouts.length - 1] : null;
     const stats = getDashboardStats(dashboardRange);
 
@@ -433,7 +475,7 @@ function loadDashboard() {
 
 function renderCalendar() {
     const container = document.getElementById("calendarContainer");
-    const workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
+    const workouts = JSON.parse(localStorage.getItem(currentUser + "_workouts") || "[]");
 
     const today = new Date();
     const displayDate = new Date(today.getFullYear(), today.getMonth() + calendarMonthOffset, 1);
@@ -494,7 +536,7 @@ function renderCalendar() {
 
 function showWorkoutsForDay(date) {
     const box = document.getElementById("calendarDetails");
-    const workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
+    const workouts = JSON.parse(localStorage.getItem(currentUser + "_workouts") || "[]");
     const todays = workouts.filter(w => w.date === date);
 
     if (!todays.length) return;
@@ -696,9 +738,9 @@ function addWorkout() {
         newWorkout.duration = Number(document.getElementById("logDuration")?.value || newWorkout.duration || 0);
     }
 
-    const workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
+    const workouts = JSON.parse(localStorage.getItem(currentUser + "_workouts") || "[]");
     workouts.push(newWorkout);
-    localStorage.setItem("workouts", JSON.stringify(workouts));
+    localStorage.setItem(currentUser + "_workouts", JSON.stringify(workouts));
 
     loadTrainingLog();
     renderCalendar();
@@ -710,7 +752,7 @@ function addWorkout() {
 
 function loadWorkouts() {
     const tbody = document.getElementById("workoutTableBody");
-    const workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
+    const workouts = JSON.parse(localStorage.getItem(currentUser + "_workouts") || "[]");
     tbody.innerHTML = "";
 
     workouts.forEach((w, index) => {
@@ -737,9 +779,9 @@ function loadWorkouts() {
 --------------------------- */
 
 function deleteWorkout(index) {
-    const workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
+    const workouts = JSON.parse(localStorage.getItem(currentUser + "_workouts") || "[]");
     workouts.splice(index, 1);
-    localStorage.setItem("workouts", JSON.stringify(workouts));
+    localStorage.setItem(currentUser + "_workouts", JSON.stringify(workouts));
 
     loadTrainingLog();
     renderCalendar();
@@ -752,7 +794,7 @@ function deleteWorkout(index) {
 function openEditModal(index) {
     editModal.style.display = "block";
 
-    const workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
+    const workouts = JSON.parse(localStorage.getItem(currentUser + "_workouts") || "[]");
     const w = workouts[index];
 
     document.getElementById("editDate").value = w.date;
@@ -835,7 +877,7 @@ function openEditModal(index) {
 }
 
 function saveEditedWorkout(index) {
-    const workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
+    const workouts = JSON.parse(localStorage.getItem(currentUser + "_workouts") || "[]");
     const w = workouts[index];
     const type = w.type;
 
@@ -870,7 +912,7 @@ function saveEditedWorkout(index) {
         w.pilatesIntensity = document.getElementById("editPilatesIntensity").value;
     }
 
-    localStorage.setItem("workouts", JSON.stringify(workouts));
+    localStorage.setItem(currentUser + "_workouts", JSON.stringify(workouts));
     editModal.style.display = "none";
 
     loadTrainingLog();
@@ -882,9 +924,10 @@ function saveEditedWorkout(index) {
 --------------------------- */
 
 function loadProgress() {
-    const weight = Number(localStorage.getItem("userWeightLbs"));
-    const goal = Number(localStorage.getItem("userWeightGoal"));
-    const history = JSON.parse(localStorage.getItem("weightHistory") || "[]");
+    const weight = Number(localStorage.getItem(currentUser + "_userWeightLbs"));
+    const goal = Number(localStorage.getItem(currentUser + "_userWeightGoal"));
+    const history = JSON.parse(localStorage.getItem(currentUser + "_weightHistory") || "[]");
+
 
     const startWeight = history.length ? history[0].weight : weight;
     const diff = weight - goal;
@@ -964,7 +1007,7 @@ function loadProgress() {
 
 
 function generateCharts() {
-    const workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
+    const workouts = JSON.parse(localStorage.getItem(currentUser + "_workouts") || "[]");
 
     // Count minutes per workout day of the week
     const daysOfWeek = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -1007,7 +1050,7 @@ function generateCharts() {
 
 
 function generateWorkoutTypePieChart() {
-    const workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
+    const workouts = JSON.parse(localStorage.getItem(currentUser + "_workouts") || "[]");
 
     const typeCounts = {};
 
@@ -1050,7 +1093,8 @@ function generateWorkoutTypePieChart() {
 
 
 function generateWeightLineChart() {
-    const history = JSON.parse(localStorage.getItem("weightHistory") || "[]");
+    let history = JSON.parse(localStorage.getItem(currentUser + "_weightHistory") || "[]");
+    history.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const dates = history.map(h => h.date);
     const weights = history.map(h => h.weight);
@@ -1093,11 +1137,12 @@ function generateWeightLineChart() {
 --------------------------- */
 
 function loadProfilePage() {
-    const name = localStorage.getItem("userName") || "";
-    const height = Number(localStorage.getItem("userHeightInches") || 0);
-    const weight = localStorage.getItem("userWeightLbs") || "";
-    const age = localStorage.getItem("userAge") || "";
-    const goalWeight = localStorage.getItem("userWeightGoal") || "";
+    const name = localStorage.getItem(currentUser + "_userName") || "";
+    const height = Number(localStorage.getItem(currentUser + "_userHeightInches") || 0);
+    const weight = localStorage.getItem(currentUser + "_userWeightLbs") || "";
+    const age = localStorage.getItem(currentUser + "_userAge") || "";
+    const goalWeight = localStorage.getItem(currentUser + "_userWeightGoal") || "";
+
 
     const feet = height ? Math.floor(height / 12) : "";
     const inches = height ? height % 12 : "";
@@ -1171,18 +1216,22 @@ function saveProfileChanges() {
     const goalWeight = Number(document.getElementById("profGoalWeight").value);
     const age = Number(document.getElementById("profAge").value);
 
-    localStorage.setItem("userName", name);
-    localStorage.setItem("userHeightInches", ft*12 + inch);
-    localStorage.setItem("userWeightLbs", weight);
-    localStorage.setItem("userWeightGoal", goalWeight);
-    localStorage.setItem("userAge", age);
+    localStorage.setItem(currentUser + "_userName", name);
+    localStorage.setItem(currentUser + "_userHeightInches", ft*12 + inch);
+    localStorage.setItem(currentUser + "_userWeightLbs", weight);
+    localStorage.setItem(currentUser + "_userWeightGoal", goalWeight);
+    localStorage.setItem(currentUser + "_userAge", age);
 
-    const history = JSON.parse(localStorage.getItem("weightHistory") || "[]");
-    history.push({
-        date: new Date().toISOString().split("T")[0],
-        weight
-    });
-    localStorage.setItem("weightHistory", JSON.stringify(history));
+    let history = JSON.parse(localStorage.getItem(currentUser + "_weightHistory") || "[]");
+
+    if (history.length === 0 || history[history.length - 1].weight !== weight) {
+        history.push({
+            date: new Date().toISOString().split("T")[0],
+            weight: weight
+        });
+    }
+
+    localStorage.setItem(currentUser + "_weightHistory", JSON.stringify(history));
 
     showWelcome();
     alert("Profile updated!");
@@ -1193,7 +1242,7 @@ function saveProfileChanges() {
 --------------------------- */
 
 function loadWorkoutPlan() {
-    const goal = localStorage.getItem("userGoal");
+    const goal = localStorage.getItem(currentUser + "_userGoal");
 
     let title = "Your Workout Plan";
     let body = "";
@@ -1260,8 +1309,9 @@ accountSettingsNav.onclick = () => {
 };
 
 function loadAccountSettings() {
-    const email = localStorage.getItem("userEmail") || "";
-    const password = localStorage.getItem("userPassword") || "";
+    const email = localStorage.getItem(currentUser + "_userEmail") || "";
+    const password = localStorage.getItem(currentUser + "_userPassword") || "";
+
 
     content.innerHTML = `
         <h2>Account Settings</h2>
@@ -1281,8 +1331,9 @@ function loadAccountSettings() {
         const newEmail = document.getElementById("accEmail").value;
         const newPass = document.getElementById("accPassword").value;
 
-        localStorage.setItem("userEmail", newEmail);
-        localStorage.setItem("userPassword", newPass);
+        localStorage.setItem(currentUser + "_userEmail", newEmail);
+        localStorage.setItem(currentUser + "_userPassword", newPass);
+
 
         alert("Account settings updated!");
     };
@@ -1299,15 +1350,20 @@ saveNewWeightBtn.onclick = () => {
         return;
     }
 
-    localStorage.setItem("userWeightLbs", newWeight);
+    localStorage.setItem(currentUser + "_userWeightLbs", newWeight);
 
-    const history = JSON.parse(localStorage.getItem("weightHistory") || "[]");
+    const history = JSON.parse(localStorage.getItem(currentUser + "_weightHistory") || "[]");
     history.push({
         date: new Date().toISOString().split("T")[0],
         weight: newWeight
     });
-    localStorage.setItem("weightHistory", JSON.stringify(history));
+
+    localStorage.setItem(currentUser + "_weightHistory", JSON.stringify(history));
 
     weightModal.style.display = "none";
+    if (document.querySelector(".profile-box")) {
+    loadProfilePage();
+    }
+
     loadPage("Progress");
 };
