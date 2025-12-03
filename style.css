@@ -137,6 +137,37 @@ main {
     color: black !important;
 }
 
+/* Dashboard Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.card {
+    background: #f4f6ff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.card-number {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 10px 0;
+    color: #2563eb;
+}
+
+.last-workout-card {
+    background: #fff5e6;
+    padding: 15px;
+    border-left: 5px solid #ff9800;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+
 /* Workout Log Form */
 .log-form {
     background: #f8f9ff;
@@ -227,4 +258,67 @@ main {
 
 .deleteBtn:hover {
     background: #d32f2f;
+}
+
+/* Workout Plan */
+.plan-box {
+    background: #e9f5ff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+/* Profile */
+.profile-box {
+    background: #f8f9ff;
+    padding: 25px;
+    border-radius: 14px;
+    max-width: 450px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.profile-box label {
+    font-weight: bold;
+    margin-top: 12px;
+    display: block;
+}
+
+.profile-box input,
+.profile-box select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 4px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+}
+
+.height-row {
+    display: flex;
+    gap: 10px;
+}
+
+.profile-box button {
+    margin-top: 20px;
+    padding: 12px;
+    width: 100%;
+    border: none;
+    background: #2563eb;
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.profile-box button:hover {
+    background: #1e4fd3;
+}
+
+.cancel-btn {
+    background: #aaa;
+}
+
+.cancel-btn:hover {
+    background: #888;
 }
