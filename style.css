@@ -1,143 +1,123 @@
-/* Reset */
-* {
+/* -------- GLOBAL -------- */
+body {
+    background: #f4f7fb;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
-/* Body layout */
-body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
-
-/* Header */
 header {
-    width: 100%;
-    background: #ADADAD;
-    color: white;
-    padding: 15px 20px;
+    background: white;
+    padding: 15px 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid #e3e8f0;
+    margin-left: 200px;
 }
 
 .logo {
+    margin: 0;
     font-size: 24px;
-}
-
-#header-right {
-    display: flex;
-    align-items: center;
+    color: #1b2a4e;
 }
 
 .header-btn {
-    padding: 8px 14px;
-    margin-left: 8px;
+    background: #2563eb;
     border: none;
-    background: white;
-    color: #2563eb;
-    font-weight: bold;
-    border-radius: 6px;
+    color: white;
+    padding: 8px 16px;
+    margin-left: 10px;
+    border-radius: 8px;
     cursor: pointer;
 }
 
 .header-btn:hover {
-    background: #dce7ff;
+    background: #1e4fd3;
 }
 
-/* Sidebar */
+/* ---------- SIDEBAR ---------- */
 .sidebar {
     width: 200px;
-    background: #ABC9DE;
+    background: #222c3d;
     color: white;
-    padding: 20px;
+    height: 100vh;
+    padding-top: 20px;
     position: fixed;
-    top: 70px;
-    bottom: 0;
+    left: 0;
+    top: 0;
 }
 
 .sidebar ul {
     list-style: none;
+    padding: 0;
 }
 
 .sidebar li {
-    padding: 12px 0;
+    padding: 14px;
     cursor: pointer;
+    transition: 0.3s;
 }
 
 .sidebar li:hover {
-    color: #999999;
+    background: #1a2331;
 }
 
-/* Active page highlight */
 .sidebar li.active {
-    background-color: #DEDEDE;
-    padding-left: 10px;
-    /* border-radius: 4px; */
+    background: #1a2331;
 }
 
-/* Main content */
-main {
+.gear-icon {
+    font-size: 18px;
+}
+
+/* ---------- CONTENT AREA ---------- */
+#content {
     margin-left: 220px;
-    padding: 20px;
+    margin-top: 20px;
+    padding: 25px;
+    background: white;
+    border-radius: 14px;
+    max-width: 1000px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-/* Modals */
+/* ---------- MODALS ---------- */
 .modal {
     display: none;
     position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
+    z-index: 50;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
     background: rgba(0,0,0,0.5);
 }
 
 .modal-content {
-    width: 300px;
     background: white;
-    margin: 120px auto;
-    padding: 20px;
-    border-radius: 8px;
+    margin: 10% auto;
+    padding: 25px;
+    border-radius: 10px;
+    width: 350px;
 }
 
-.modal-content h2 {
-    margin-bottom: 10px;
-}
-
-.modal-content input,
-.modal-content select {
-    width: 100%;
-    padding: 8px;
-    margin: 8px 0;
-}
-
-.modal-content button {
+/* ---------- INPUTS ---------- */
+input, select {
     width: 100%;
     padding: 10px;
-    background: #2563eb;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* ---------- BUTTONS ---------- */
+button {
     cursor: pointer;
-    margin-top: 10px;
+    font-size: 16px;
 }
 
-.modal-content button:hover {
-    background: #1e4fd3;
-}
-
-.closeLoginModal {
-    margin-top: 5px;
-    background: #ccc !important;
-    color: black !important;
-}
-
-/* Dashboard Layout */
+/* ---------- DASHBOARD ---------- */
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -145,152 +125,54 @@ main {
 }
 
 .card {
-    background: #f4f6ff;
+    background: #eef3ff;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 12px;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .card-number {
-    font-size: 28px;
-    font-weight: bold;
-    margin: 10px 0;
+    font-size: 26px;
     color: #2563eb;
+    font-weight: bold;
 }
 
 .last-workout-card {
-    background: #fff5e6;
+    background: #fff7e6;
     padding: 15px;
-    border-left: 5px solid #ff9800;
+    border-left: 5px solid #ffa726;
     border-radius: 8px;
-    margin-top: 10px;
 }
 
-
-/* Workout Log Form */
-.log-form {
-    background: #f8f9ff;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+/* ---------- PROFILE ---------- */
+.profile-box, .settings-box {
+    background: #f9fbff;
+    padding: 20px;
+    border-radius: 12px;
     max-width: 450px;
 }
 
-.log-form input,
-.log-form select {
-    width: 100%;
-    padding: 8px;
-    margin: 6px 0 12px 0;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
-
-.log-form button {
-    width: 100%;
-    padding: 10px;
-    background: #2563eb;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+.profile-box label,
+.settings-box label {
     font-weight: bold;
+    display: block;
+    margin-top: 10px;
 }
 
-.log-form button:hover {
-    background: #1e4fd3;
-}
-
-/* Workout Table */
-#workoutTable {
+.profile-box button,
+.settings-box button {
+    padding: 12px;
     width: 100%;
-    border-collapse: collapse;
+    background: #2563eb;
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
     margin-top: 20px;
 }
 
-#workoutTable th, #workoutTable td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-}
-
-#workoutTable th {
-    background: #e0e7ff;
-}
-
-.deleteBtn {
-    background: #ef4444;
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.deleteBtn:hover {
-    background: #d32f2f;
-}
-
-/* Workout Table */
-#workoutTable {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-#workoutTable th, #workoutTable td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-}
-
-#workoutTable th {
-    background: #e0e7ff;
-}
-
-.deleteBtn {
-    background: #ef4444;
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.deleteBtn:hover {
-    background: #d32f2f;
-}
-
-/* Workout Plan */
-.plan-box {
-    background: #e9f5ff;
-    padding: 20px;
-    border-radius: 8px;
-    margin-top: 10px;
-}
-
-/* Profile */
-.profile-box {
-    background: #f8f9ff;
-    padding: 25px;
-    border-radius: 14px;
-    max-width: 450px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.profile-box label {
-    font-weight: bold;
-    margin-top: 12px;
-    display: block;
-}
-
-.profile-box input,
-.profile-box select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 4px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 15px;
+.cancel-btn {
+    background: #999;
 }
 
 .height-row {
@@ -298,27 +180,27 @@ main {
     gap: 10px;
 }
 
-.profile-box button {
-    margin-top: 20px;
-    padding: 12px;
+/* ---------- TRAINING LOG TABLE ---------- */
+.workout-table {
     width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.workout-table th, .workout-table td {
+    border-bottom: 1px solid #ddd;
+    padding: 12px;
+}
+
+.editBtn, .deleteBtn {
+    padding: 8px 12px;
     border: none;
-    background: #2563eb;
+    border-radius: 6px;
     color: white;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 16px;
 }
 
-.profile-box button:hover {
-    background: #1e4fd3;
-}
+.editBtn { background: #1976d2; }
+.deleteBtn { background: #d32f2f; }
 
-.cancel-btn {
-    background: #aaa;
-}
-
-.cancel-btn:hover {
-    background: #888;
-}
+.editBtn:hover { background: #145cab; }
+.deleteBtn:hover { background: #b32525; }

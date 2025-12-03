@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Glow Fitness Tracker</title>
+    <title>Witness My Fitness</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Chart.js for Progress charts -->
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
     <!-- HEADER -->
     <header>
-        <h1 class="logo">Daily Glow Fitness Tracker</h1>
+        <h1 class="logo">Witness My Fitness</h1>
 
         <div id="header-right">
             <button id="loginBtn" class="header-btn">Login</button>
@@ -23,24 +26,41 @@
         </div>
     </header>
 
-    <!-- LAYOUT -->
-    <div class="layout">
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <ul>
-                <li>Dashboard</li>
-                <li>Progress</li>
-                <li>Training Log</li>
-                <li>Workout Plan</li>
-                <li>Profile</li>
-            </ul>
-        </aside>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <ul>
+            <li>Dashboard</li>
+            <li>Progress</li>
+            <li>Training Log</li>
+            <li>Workout Plan</li>
+            <li>Profile</li>
 
-        <!-- MAIN CONTENT -->
-        <main id="content">
-            <h2>Welcome!</h2>
-            <p>Please login or create an account to continue.</p>
-        </main>
+            <!-- Account Settings with gear icon -->
+            <li id="accountSettingsNav">
+                <span style="display:flex; align-items:center; gap:8px;">
+                    <span class="gear-icon">⚙️</span> Account Settings
+                </span>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main id="content"></main>
+
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2>Login</h2>
+
+            <label>Email:</label>
+            <input type="email" id="loginEmail">
+
+            <label>Password:</label>
+            <input type="password" id="loginPassword">
+
+            <button id="loginSubmit">Login</button>
+            <button class="closeModal">Cancel</button>
+        </div>
     </div>
 
     <!-- CREATE ACCOUNT MODAL -->
@@ -78,13 +98,13 @@
         </div>
     </div>
 
-    <!-- STATS INPUT MODAL (IMPERIAL) -->
+    <!-- STATS SETUP MODAL -->
     <div id="statsModal" class="modal">
         <div class="modal-content">
             <h2>Your Stats</h2>
 
             <label>Height:</label>
-            <div style="display:flex; gap:8px;">
+            <div style="display:flex; gap:10px;">
                 <input type="number" id="userHeightFeet" placeholder="Feet">
                 <input type="number" id="userHeightInches" placeholder="Inches">
             </div>
@@ -96,22 +116,6 @@
             <input type="number" id="userAge">
 
             <button id="finishSetup">Finish Setup</button>
-        </div>
-    </div>
-
-    <!-- LOGIN MODAL -->
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <h2>Login</h2>
-
-            <label>Email:</label>
-            <input type="email" id="loginEmail">
-
-            <label>Password:</label>
-            <input type="password" id="loginPassword">
-
-            <button id="loginSubmit">Login</button>
-            <button id="loginClose" class="closeModal">Cancel</button>
         </div>
     </div>
 
@@ -140,12 +144,24 @@
             <input type="number" id="editCalories">
 
             <button id="saveEditBtn">Save Changes</button>
-            <button id="editClose" class="closeModal">Cancel</button>
+            <button class="closeModal" id="editClose">Cancel</button>
         </div>
     </div>
 
+    <!-- UPDATE WEIGHT MODAL -->
+    <div id="weightModal" class="modal">
+        <div class="modal-content">
+            <h2>Update Weight</h2>
 
+            <label>New Weight (lbs):</label>
+            <input type="number" id="newWeightInput">
+
+            <button id="saveNewWeightBtn">Save</button>
+            <button class="closeModal">Cancel</button>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
+
 </html>

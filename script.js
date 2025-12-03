@@ -6,11 +6,12 @@ const createBtn = document.getElementById("createBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 const welcomeMsg = document.getElementById("welcomeMsg");
 
+const loginModal = document.getElementById("loginModal");
 const createModal = document.getElementById("createModal");
 const goalModal = document.getElementById("goalModal");
 const statsModal = document.getElementById("statsModal");
-const loginModal = document.getElementById("loginModal");
 const editModal = document.getElementById("editModal");
+const weightModal = document.getElementById("weightModal");
 
 const closeBtns = document.querySelectorAll(".closeModal");
 
@@ -18,12 +19,11 @@ const createAccountSubmit = document.getElementById("createAccountSubmit");
 const goalNext = document.getElementById("goalNext");
 const finishSetup = document.getElementById("finishSetup");
 const loginSubmit = document.getElementById("loginSubmit");
-const loginClose = document.getElementById("loginClose");
 
 const content = document.getElementById("content");
 const navItems = document.querySelectorAll(".sidebar li");
 
-let currentEditIndex = null; // for editing workouts
+let currentEditIndex = null;
 
 
 // ---------------------------------------
@@ -54,9 +54,7 @@ function formatGoal(goal) {
 // ---------------------------------------
 // CREATE ACCOUNT FLOW
 // ---------------------------------------
-createBtn.onclick = () => {
-    createModal.style.display = "block";
-};
+createBtn.onclick = () => createModal.style.display = "block";
 
 createAccountSubmit.onclick = () => {
     const name = document.getElementById("regName").value;
@@ -95,7 +93,7 @@ finishSetup.onclick = () => {
         return;
     }
 
-    const totalInches = (parseInt(feet) * 12) + parseInt(inches);
+    const totalInches = (Number(feet) * 12) + Number(inches);
 
     localStorage.setItem("userHeightFeet", feet);
     localStorage.setItem("userHeightInches", inches);
@@ -113,13 +111,7 @@ finishSetup.onclick = () => {
 // ---------------------------------------
 // LOGIN
 // ---------------------------------------
-loginBtn.onclick = () => {
-    loginModal.style.display = "block";
-};
-
-loginClose.onclick = () => {
-    loginModal.style.display = "none";
-};
+loginBtn.onclick = () => loginModal.style.display = "block";
 
 loginSubmit.onclick = () => {
     const email = document.getElementById("loginEmail").value;
@@ -140,7 +132,7 @@ loginSubmit.onclick = () => {
 
 
 // ---------------------------------------
-// WELCOME + LOGOUT
+// WELCOME / LOGOUT
 // ---------------------------------------
 function showWelcome() {
     const name = localStorage.getItem("userName");
@@ -153,21 +145,17 @@ function showWelcome() {
         createBtn.style.display = "none";
     }
 }
-
 showWelcome();
 
 logoutBtn.onclick = () => {
     localStorage.removeItem("userName");
     welcomeMsg.style.display = "none";
     logoutBtn.style.display = "none";
-
     loginBtn.style.display = "inline-block";
     createBtn.style.display = "inline-block";
 
     removeAllHighlights();
     loadPage("Welcome");
-
-    alert("You have been logged out.");
 };
 
 
@@ -184,7 +172,13 @@ navItems.forEach(item => {
         removeAllHighlights();
         item.classList.add("active");
 
-        const page = item.textContent.trim();
+        let page;
+        if (item.id === "accountSettingsNav") {
+            page = "Account Settings";
+        } else {
+            page = item.textContent.trim();
+        }
+
         loadPage(page);
     });
 });
@@ -212,7 +206,7 @@ function loadPage(page) {
         return;
     }
 
-    // ----------------- WELCOME (no login) -----------------
+    // ---------- WELCOME ----------
     if (page === "Welcome") {
         content.innerHTML = `
             <h2>Welcome!</h2>
@@ -220,7 +214,7 @@ function loadPage(page) {
         `;
     }
 
-    // ----------------- DASHBOARD -----------------
+    // ---------- DASHBOARD ----------
     if (page === "Dashboard") {
         const name = localStorage.getItem("userName") || "User";
         const workouts = JSON.parse(localStorage.getItem("workouts")) || [];
@@ -256,7 +250,7 @@ function loadPage(page) {
             } else if (diff > 0) {
                 weightMsg = `You are ${diff} lbs away from your goal.`;
             } else if (diff < 0) {
-                weightMsg = `You passed your goal by ${Math.abs(diff)} lbs!`;
+                weightMsg = `You passed your goal by ${Math.abs(diff)} lbs.`;
             } else {
                 weightMsg = `You reached your goal weight! 🎉`;
             }
@@ -308,7 +302,8 @@ function loadPage(page) {
         `;
     }
 
-    // ----------------- TRAINING LOG -----------------
+
+    // ---------- TRAINING LOG ----------
     if (page === "Training Log") {
         content.innerHTML = `
             <h2>Training Log</h2>
@@ -340,7 +335,7 @@ function loadPage(page) {
             </div>
 
             <h3>Your Logged Workouts</h3>
-            <table id="workoutTable">
+            <table id="workoutTable" class="workout-table">
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -358,19 +353,25 @@ function loadPage(page) {
         loadWorkouts();
     }
 
-    // ----------------- PROGRESS -----------------
+
+    // ---------- PROGRESS ----------
     if (page === "Progress") {
         content.innerHTML = `
             <h2>Progress</h2>
 
             <canvas id="weeklyWorkoutsChart"></canvas>
             <canvas id="weeklyDistanceChart" style="margin-top: 40px;"></canvas>
+
+            <h3 style="margin-top: 40px;">Weight Progress</h3>
+            <canvas id="weightProgressChart" height="120"></canvas>
         `;
 
         generateCharts();
+        generateWeightChart();
     }
 
-    // ----------------- WORKOUT PLAN -----------------
+
+    // ---------- WORKOUT PLAN ----------
     if (page === "Workout Plan") {
         const goal = localStorage.getItem("userGoal");
         let plan = "";
@@ -390,44 +391,41 @@ function loadPage(page) {
                 <ul>
                     <li>2× Cardio sessions</li>
                     <li>2× Light strength sessions</li>
-                    <li>1× Active recovery day (yoga or stretching)</li>
+                    <li>1× Active recovery day</li>
                 </ul>
             `;
         } else if (goal === "gain") {
             plan = `
                 <h3>Weight Gain Plan</h3>
                 <ul>
-                    <li>3× Strength training per week</li>
+                    <li>3× Strength training</li>
                     <li>1× Light cardio</li>
-                    <li>Eat 200–300 extra calories/day</li>
+                    <li>Eat 200–300 extra calories</li>
                 </ul>
             `;
         } else if (goal === "muscle") {
             plan = `
                 <h3>Muscle Building Plan</h3>
                 <ul>
-                    <li>4× Strength split (e.g., Upper / Lower / Push / Pull)</li>
-                    <li>1–2× light cardio for heart health</li>
-                    <li>Focus on progressive overload each week</li>
+                    <li>4× Strength Split (Upper/Lower/Push/Pull)</li>
+                    <li>1–2× Low-intensity cardio</li>
+                    <li>Progressive overload weekly</li>
                 </ul>
             `;
         } else {
-            plan = `
-                <p>No goal set yet. Go to your Profile and select a fitness goal.</p>
-            `;
+            plan = `<p>No goal set. Go to Profile to set one.</p>`;
         }
 
         content.innerHTML = `
             <h2>Workout Plan</h2>
-            <p>Your customized plan based on your goals:</p>
             <div class="plan-box">${plan}</div>
         `;
     }
 
-    // ----------------- PROFILE -----------------
+
+    // ---------- PROFILE ----------
     if (page === "Profile") {
         const name = localStorage.getItem("userName") || "";
-        const email = localStorage.getItem("userEmail") || "";
         const feet = localStorage.getItem("userHeightFeet") || "";
         const inches = localStorage.getItem("userHeightInches") || "";
         const weight = localStorage.getItem("userWeightLbs") || "";
@@ -439,24 +437,21 @@ function loadPage(page) {
             <h2>User Profile</h2>
 
             <div id="profileView" class="profile-box">
-
                 <p><strong>Name:</strong> ${name}</p>
-                <p><strong>Email:</strong> ${email}</p>
                 <p><strong>Height:</strong> ${feet} ft ${inches} in</p>
                 <p><strong>Weight:</strong> ${weight} lbs</p>
                 <p><strong>Age:</strong> ${age}</p>
                 <p><strong>Fitness Goal:</strong> ${formatGoal(goal)}</p>
                 <p><strong>Weight Goal:</strong> ${weightGoal || "Not set"} lbs</p>
 
+                <button id="updateWeightBtn">Update Weight</button>
                 <button id="editProfileBtn">Edit Profile</button>
             </div>
 
             <div id="profileEdit" class="profile-box" style="display:none;">
+
                 <label>Name:</label>
                 <input type="text" id="profileName" value="${name}">
-
-                <label>Email:</label>
-                <input type="email" id="profileEmail" value="${email}">
 
                 <label>Height:</label>
                 <div class="height-row">
@@ -479,28 +474,48 @@ function loadPage(page) {
                 </select>
 
                 <label>Weight Goal (lbs):</label>
-                <input type="number" id="profileWeightGoal" value="${weightGoal}" placeholder="Goal Weight">
+                <input type="number" id="profileWeightGoal" value="${weightGoal || ""}">
 
                 <button id="saveProfileBtn">Save</button>
                 <button id="cancelProfileBtn" class="cancel-btn">Cancel</button>
-
             </div>
-
         `;
 
-        // Activate buttons
+        // Buttons
         document.getElementById("editProfileBtn").onclick = () => {
             document.getElementById("profileView").style.display = "none";
             document.getElementById("profileEdit").style.display = "block";
         };
 
-        document.getElementById("cancelProfileBtn").onclick = () => {
-            loadPage("Profile");
-        };
+        document.getElementById("cancelProfileBtn").onclick = () => loadPage("Profile");
 
         document.getElementById("saveProfileBtn").onclick = saveProfileChanges;
+
+        document.getElementById("updateWeightBtn").onclick = () => {
+            weightModal.style.display = "block";
+        };
     }
 
+
+    // ---------- ACCOUNT SETTINGS ----------
+    if (page === "Account Settings") {
+        const email = localStorage.getItem("userEmail") || "";
+        content.innerHTML = `
+            <h2>Account Settings</h2>
+
+            <div class="settings-box">
+                <label>Change Email:</label>
+                <input type="email" id="settingsEmail" value="${email}">
+
+                <label>Change Password:</label>
+                <input type="password" id="settingsPassword" placeholder="New password">
+
+                <button id="saveSettingsBtn">Save Changes</button>
+            </div>
+        `;
+
+        document.getElementById("saveSettingsBtn").onclick = saveAccountSettings;
+    }
 }
 
 
@@ -509,30 +524,85 @@ function loadPage(page) {
 // ---------------------------------------
 function saveProfileChanges() {
     localStorage.setItem("userName", document.getElementById("profileName").value);
-    localStorage.setItem("userEmail", document.getElementById("profileEmail").value);
     localStorage.setItem("userHeightFeet", document.getElementById("profileHeightFeet").value);
     localStorage.setItem("userHeightInches", document.getElementById("profileHeightInches").value);
     localStorage.setItem("userAge", document.getElementById("profileAge").value);
-    localStorage.setItem("userWeightLbs", document.getElementById("profileWeight").value);
     localStorage.setItem("userGoal", document.getElementById("profileGoal").value);
     localStorage.setItem("userWeightGoal", document.getElementById("profileWeightGoal").value);
 
+    const newWeight = document.getElementById("profileWeight").value;
+    localStorage.setItem("userWeightLbs", newWeight);
+
+    if (newWeight) {
+        const history = JSON.parse(localStorage.getItem("weightHistory")) || [];
+        history.push({
+            date: new Date().toISOString().split("T")[0],
+            weight: Number(newWeight)
+        });
+        localStorage.setItem("weightHistory", JSON.stringify(history));
+    }
+
     alert("Profile updated!");
     showWelcome();
+    loadPage("Profile");
 }
 
 
 // ---------------------------------------
-// TRAINING LOG – DYNAMIC FIELDS
+// ACCOUNT SETTINGS SAVE
+// ---------------------------------------
+function saveAccountSettings() {
+    const email = document.getElementById("settingsEmail").value;
+    const password = document.getElementById("settingsPassword").value;
+
+    if (!email) {
+        alert("Email cannot be empty.");
+        return;
+    }
+
+    localStorage.setItem("userEmail", email);
+    if (password.trim() !== "") {
+        localStorage.setItem("userPassword", password);
+    }
+
+    alert("Account settings updated.");
+}
+
+
+// ---------------------------------------
+// UPDATE WEIGHT MODAL SAVE
+// ---------------------------------------
+document.getElementById("saveNewWeightBtn").onclick = () => {
+    const newWeight = document.getElementById("newWeightInput").value;
+
+    if (!newWeight) {
+        alert("Please enter a valid weight.");
+        return;
+    }
+
+    localStorage.setItem("userWeightLbs", newWeight);
+
+    const history = JSON.parse(localStorage.getItem("weightHistory")) || [];
+    history.push({
+        date: new Date().toISOString().split("T")[0],
+        weight: Number(newWeight)
+    });
+    localStorage.setItem("weightHistory", JSON.stringify(history));
+
+    weightModal.style.display = "none";
+    alert("Weight updated!");
+    loadPage("Profile");
+};
+
+
+// ---------------------------------------
+// TRAINING LOG – CONDITIONAL FIELDS
 // ---------------------------------------
 function updateConditionalFields() {
     const type = document.getElementById("logType").value;
     const container = document.getElementById("conditionalFields");
-
-    if (!container) return;
     container.innerHTML = "";
 
-    // CARDIO — Running / Walking / Cycling
     if (type === "running" || type === "walking" || type === "cycling") {
         container.innerHTML = `
             <label>Distance (miles):</label>
@@ -543,7 +613,6 @@ function updateConditionalFields() {
         `;
     }
 
-    // WEIGHT LIFTING
     if (type === "lifting") {
         container.innerHTML = `
             <label>Exercise Name:</label>
@@ -560,11 +629,10 @@ function updateConditionalFields() {
         `;
     }
 
-    // BODYWEIGHT
     if (type === "bodyweight") {
         container.innerHTML = `
             <label>Exercise Name:</label>
-            <input type="text" id="bwName" placeholder="e.g., Push-ups">
+            <input type="text" id="bwName">
 
             <label>Sets:</label>
             <input type="number" id="bwSets">
@@ -581,7 +649,6 @@ function updateConditionalFields() {
         `;
     }
 
-    // YOGA
     if (type === "yoga") {
         container.innerHTML = `
             <label>Session Type:</label>
@@ -596,7 +663,6 @@ function updateConditionalFields() {
         `;
     }
 
-    // PILATES
     if (type === "pilates") {
         container.innerHTML = `
             <label>Class Type:</label>
@@ -618,12 +684,10 @@ function updateConditionalFields() {
 // ---------------------------------------
 function loadWorkouts() {
     const workouts = JSON.parse(localStorage.getItem("workouts")) || [];
-    const table = document.getElementById("workoutTableBody");
+    const body = document.getElementById("workoutTableBody");
+    body.innerHTML = "";
 
-    if (!table) return;
-    table.innerHTML = "";
-
-    workouts.forEach((w, index) => {
+    workouts.forEach((w, i) => {
         const row = document.createElement("tr");
 
         row.innerHTML = `
@@ -637,42 +701,35 @@ function loadWorkouts() {
                 ${w.sets ? `Sets: ${w.sets}<br>` : ""}
                 ${w.reps ? `Reps: ${w.reps}<br>` : ""}
                 ${w.weight ? `Weight: ${w.weight} lbs<br>` : ""}
-
                 ${w.bwName ? `Exercise: ${w.bwName}<br>` : ""}
                 ${w.bwSets ? `Sets: ${w.bwSets}<br>` : ""}
                 ${w.bwReps ? `Reps: ${w.bwReps}<br>` : ""}
                 ${w.bwDifficulty ? `Difficulty: ${w.bwDifficulty}<br>` : ""}
-
                 ${w.yogaType ? `Yoga: ${w.yogaType}<br>` : ""}
                 ${w.difficulty ? `Difficulty: ${w.difficulty}<br>` : ""}
-
                 ${w.pilatesType ? `Pilates: ${w.pilatesType}<br>` : ""}
                 ${w.pilatesIntensity ? `Intensity: ${w.pilatesIntensity}` : ""}
             </td>
             <td>
-                <button class="editBtn" data-index="${index}">Edit</button>
-                <button class="deleteBtn" data-index="${index}">Delete</button>
+                <button class="editBtn" data-index="${i}">Edit</button>
+                <button class="deleteBtn" data-index="${i}">Delete</button>
             </td>
         `;
 
-        table.appendChild(row);
+        body.appendChild(row);
     });
 
-    // Delete listeners
     document.querySelectorAll(".deleteBtn").forEach(btn => {
         btn.onclick = () => deleteWorkout(btn.dataset.index);
     });
 
-    // Edit listeners
     document.querySelectorAll(".editBtn").forEach(btn => {
         btn.onclick = () => openEditModal(btn.dataset.index);
     });
 
-    // Add workout listener
     const addBtn = document.getElementById("addWorkoutBtn");
     if (addBtn) addBtn.onclick = addWorkout;
 
-    // Dynamic fields
     const typeSelect = document.getElementById("logType");
     if (typeSelect) typeSelect.onchange = updateConditionalFields;
 }
@@ -692,88 +749,72 @@ function addWorkout() {
     }
 
     let duration = "";
-    let extraData = {};
+    let extra = {};
 
-    // CARDIO – Duration required
     if (type === "running" || type === "walking" || type === "cycling") {
-        const durField = document.getElementById("logDuration");
-        if (!durField) {
-            alert("Error: Duration field missing. Try reselecting exercise type.");
+        const dur = document.getElementById("logDuration");
+        const dist = document.getElementById("logDistance");
+
+        if (!dur.value) {
+            alert("Duration required for this exercise.");
             return;
         }
 
-        duration = durField.value;
-        if (!duration) {
-            alert("Duration is required for this exercise.");
-            return;
-        }
-
-        extraData.distance = document.getElementById("logDistance").value;
+        duration = dur.value;
+        extra.distance = dist.value;
     }
 
-    // WEIGHT LIFTING
     if (type === "lifting") {
-        extraData.liftName = document.getElementById("logLiftName").value;
-        extraData.sets = document.getElementById("logSets").value;
-        extraData.reps = document.getElementById("logReps").value;
-        extraData.weight = document.getElementById("logLiftWeight").value;
+        extra.liftName = document.getElementById("logLiftName").value;
+        extra.sets = document.getElementById("logSets").value;
+        extra.reps = document.getElementById("logReps").value;
+        extra.weight = document.getElementById("logLiftWeight").value;
     }
 
-    // BODYWEIGHT
     if (type === "bodyweight") {
-        extraData.bwName = document.getElementById("bwName").value;
-        extraData.bwSets = document.getElementById("bwSets").value;
-        extraData.bwReps = document.getElementById("bwReps").value;
-        extraData.bwDifficulty = document.getElementById("bwDifficulty").value;
+        extra.bwName = document.getElementById("bwName").value;
+        extra.bwSets = document.getElementById("bwSets").value;
+        extra.bwReps = document.getElementById("bwReps").value;
+        extra.bwDifficulty = document.getElementById("bwDifficulty").value;
     }
 
-    // YOGA
     if (type === "yoga") {
-        extraData.yogaType = document.getElementById("logYogaType").value;
-        extraData.difficulty = document.getElementById("logDifficulty").value;
+        extra.yogaType = document.getElementById("logYogaType").value;
+        extra.difficulty = document.getElementById("logDifficulty").value;
     }
 
-    // PILATES
     if (type === "pilates") {
-        extraData.pilatesType = document.getElementById("logPilatesType").value;
-        extraData.pilatesIntensity = document.getElementById("logPilatesIntensity").value;
+        extra.pilatesType = document.getElementById("logPilatesType").value;
+        extra.pilatesIntensity = document.getElementById("logPilatesIntensity").value;
     }
 
     const workouts = JSON.parse(localStorage.getItem("workouts")) || [];
 
-    workouts.push({
-        date,
-        type,
-        duration,
-        calories,
-        ...extraData
-    });
+    workouts.push({ date, type, duration, calories, ...extra });
+    localStorage.setItem("workouts", JSON.stringify(workouts));
 
+    loadPage("Training Log");
+}
+
+
+// ---------------------------------------
+// TRAINING LOG – DELETE
+// ---------------------------------------
+function deleteWorkout(i) {
+    const workouts = JSON.parse(localStorage.getItem("workouts")) || [];
+    workouts.splice(i, 1);
     localStorage.setItem("workouts", JSON.stringify(workouts));
     loadPage("Training Log");
 }
 
 
 // ---------------------------------------
-// TRAINING LOG – DELETE WORKOUT
+// EDIT WORKOUT – OPEN
 // ---------------------------------------
-function deleteWorkout(index) {
+function openEditModal(i) {
     const workouts = JSON.parse(localStorage.getItem("workouts")) || [];
-    workouts.splice(index, 1);
-    localStorage.setItem("workouts", JSON.stringify(workouts));
-    loadPage("Training Log");
-}
-
-
-// ---------------------------------------
-// EDIT WORKOUT – OPEN MODAL
-// ---------------------------------------
-function openEditModal(index) {
-    const workouts = JSON.parse(localStorage.getItem("workouts")) || [];
-    const w = workouts[index];
-    if (!w) return;
-
-    currentEditIndex = index;
+    const w = workouts[i];
+    currentEditIndex = i;
 
     editModal.style.display = "block";
 
@@ -784,30 +825,25 @@ function openEditModal(index) {
     renderEditConditionalFields(w.type, w);
 
     const editTypeSelect = document.getElementById("editType");
-    if (editTypeSelect) {
-        editTypeSelect.onchange = () => {
-            const newType = editTypeSelect.value;
-            renderEditConditionalFields(newType, {});
-        };
-    }
+    editTypeSelect.onchange = () => {
+        renderEditConditionalFields(editTypeSelect.value, {});
+    };
 
     document.getElementById("saveEditBtn").onclick = saveWorkoutEdit;
 }
 
 
 // ---------------------------------------
-// EDIT WORKOUT – RENDER DYNAMIC FIELDS
+// EDIT WORKOUT – RENDER FIELDS
 // ---------------------------------------
 function renderEditConditionalFields(type, w) {
     const container = document.getElementById("editConditionalFields");
-    if (!container) return;
     container.innerHTML = "";
 
     if (type === "running" || type === "walking" || type === "cycling") {
         container.innerHTML = `
             <label>Distance (miles):</label>
             <input type="number" id="editDistance" value="${w.distance || ""}">
-
             <label>Duration (minutes):</label>
             <input type="number" id="editDuration" value="${w.duration || ""}">
         `;
@@ -817,13 +853,10 @@ function renderEditConditionalFields(type, w) {
         container.innerHTML = `
             <label>Exercise Name:</label>
             <input type="text" id="editLiftName" value="${w.liftName || ""}">
-
             <label>Sets:</label>
             <input type="number" id="editSets" value="${w.sets || ""}">
-
-            <label>Reps per Set:</label>
+            <label>Reps:</label>
             <input type="number" id="editReps" value="${w.reps || ""}">
-
             <label>Weight (lbs):</label>
             <input type="number" id="editLiftWeight" value="${w.weight || ""}">
         `;
@@ -833,13 +866,10 @@ function renderEditConditionalFields(type, w) {
         container.innerHTML = `
             <label>Exercise Name:</label>
             <input type="text" id="editBwName" value="${w.bwName || ""}">
-
             <label>Sets:</label>
             <input type="number" id="editBwSets" value="${w.bwSets || ""}">
-
-            <label>Reps per Set:</label>
+            <label>Reps:</label>
             <input type="number" id="editBwReps" value="${w.bwReps || ""}">
-
             <label>Difficulty:</label>
             <select id="editBwDifficulty">
                 <option value="easy" ${w.bwDifficulty==="easy"?"selected":""}>Easy</option>
@@ -853,7 +883,6 @@ function renderEditConditionalFields(type, w) {
         container.innerHTML = `
             <label>Session Type:</label>
             <input type="text" id="editYogaType" value="${w.yogaType || ""}">
-
             <label>Difficulty:</label>
             <select id="editDifficulty">
                 <option value="easy" ${w.difficulty==="easy"?"selected":""}>Easy</option>
@@ -867,7 +896,6 @@ function renderEditConditionalFields(type, w) {
         container.innerHTML = `
             <label>Class Type:</label>
             <input type="text" id="editPilatesType" value="${w.pilatesType || ""}">
-
             <label>Intensity:</label>
             <select id="editPilatesIntensity">
                 <option value="beginner" ${w.pilatesIntensity==="beginner"?"selected":""}>Beginner</option>
@@ -879,72 +907,63 @@ function renderEditConditionalFields(type, w) {
 }
 
 
-// Close Edit modal
-document.getElementById("editClose").onclick = () => {
-    editModal.style.display = "none";
-};
-
-
 // ---------------------------------------
 // EDIT WORKOUT – SAVE
 // ---------------------------------------
 function saveWorkoutEdit() {
-    if (currentEditIndex === null) return;
-
     const workouts = JSON.parse(localStorage.getItem("workouts")) || [];
     const old = workouts[currentEditIndex];
-    if (!old) return;
 
-    const updatedType = document.getElementById("editType").value;
+    const type = document.getElementById("editType").value;
 
     const updated = {
         date: document.getElementById("editDate").value,
-        type: updatedType,
+        type,
         calories: document.getElementById("editCalories").value || ""
     };
 
     let duration = "";
-    let extraData = {};
+    let extra = {};
 
-    if (updatedType === "running" || updatedType === "walking" || updatedType === "cycling") {
-        const durField = document.getElementById("editDuration");
-        const distField = document.getElementById("editDistance");
-        if (durField) {
-            duration = durField.value;
-            if (!duration) {
-                alert("Duration is required for this exercise.");
-                return;
-            }
+    if (type === "running" || type === "walking" || type === "cycling") {
+        const dur = document.getElementById("editDuration");
+        const dist = document.getElementById("editDistance");
+
+        if (!dur.value) {
+            alert("Duration required for this exercise.");
+            return;
         }
-        extraData.distance = distField ? distField.value : "";
+
+        duration = dur.value;
+        extra.distance = dist.value;
     }
 
-    if (updatedType === "lifting") {
-        extraData.liftName = document.getElementById("editLiftName").value;
-        extraData.sets = document.getElementById("editSets").value;
-        extraData.reps = document.getElementById("editReps").value;
-        extraData.weight = document.getElementById("editLiftWeight").value;
+    if (type === "lifting") {
+        extra.liftName = document.getElementById("editLiftName").value;
+        extra.sets = document.getElementById("editSets").value;
+        extra.reps = document.getElementById("editReps").value;
+        extra.weight = document.getElementById("editLiftWeight").value;
     }
 
-    if (updatedType === "bodyweight") {
-        extraData.bwName = document.getElementById("editBwName").value;
-        extraData.bwSets = document.getElementById("editBwSets").value;
-        extraData.bwReps = document.getElementById("editBwReps").value;
-        extraData.bwDifficulty = document.getElementById("editBwDifficulty").value;
+    if (type === "bodyweight") {
+        extra.bwName = document.getElementById("editBwName").value;
+        extra.bwSets = document.getElementById("editBwSets").value;
+        extra.bwReps = document.getElementById("editBwReps").value;
+        extra.bwDifficulty = document.getElementById("editBwDifficulty").value;
     }
 
-    if (updatedType === "yoga") {
-        extraData.yogaType = document.getElementById("editYogaType").value;
-        extraData.difficulty = document.getElementById("editDifficulty").value;
+    if (type === "yoga") {
+        extra.yogaType = document.getElementById("editYogaType").value;
+        extra.difficulty = document.getElementById("editDifficulty").value;
     }
 
-    if (updatedType === "pilates") {
-        extraData.pilatesType = document.getElementById("editPilatesType").value;
-        extraData.pilatesIntensity = document.getElementById("editPilatesIntensity").value;
+    if (type === "pilates") {
+        extra.pilatesType = document.getElementById("editPilatesType").value;
+        extra.pilatesIntensity = document.getElementById("editPilatesIntensity").value;
     }
 
     updated.duration = duration;
-    Object.assign(updated, extraData);
+    Object.assign(updated, extra);
 
     workouts[currentEditIndex] = updated;
     localStorage.setItem("workouts", JSON.stringify(workouts));
@@ -989,34 +1008,54 @@ function generateCharts() {
     const workoutData = last7.map(d => d.workouts);
     const distanceData = last7.map(d => d.miles);
 
-    const workoutsCanvas = document.getElementById("weeklyWorkoutsChart");
-    const distanceCanvas = document.getElementById("weeklyDistanceChart");
+    new Chart(document.getElementById("weeklyWorkoutsChart"), {
+        type: "bar",
+        data: {
+            labels,
+            datasets: [{
+                label: "Workouts per Day",
+                data: workoutData,
+                backgroundColor: "#2563eb"
+            }]
+        }
+    });
 
-    if (workoutsCanvas) {
-        new Chart(workoutsCanvas, {
-            type: "bar",
-            data: {
-                labels,
-                datasets: [{
-                    label: "Workouts per day",
-                    data: workoutData,
-                }]
-            }
-        });
-    }
+    new Chart(document.getElementById("weeklyDistanceChart"), {
+        type: "line",
+        data: {
+            labels,
+            datasets: [{
+                label: "Miles per Day",
+                data: distanceData,
+                borderColor: "#ff5722",
+                borderWidth: 2
+            }]
+        }
+    });
+}
 
-    if (distanceCanvas) {
-        new Chart(distanceCanvas, {
-            type: "line",
-            data: {
-                labels,
-                datasets: [{
-                    label: "Miles per day",
-                    data: distanceData,
-                }]
-            }
-        });
-    }
+
+// ---------------------------------------
+// WEIGHT PROGRESS CHART
+// ---------------------------------------
+function generateWeightChart() {
+    const weightHistory = JSON.parse(localStorage.getItem("weightHistory")) || [];
+    if (weightHistory.length === 0) return;
+
+    new Chart(document.getElementById("weightProgressChart"), {
+        type: "line",
+        data: {
+            labels: weightHistory.map(w => w.date),
+            datasets: [{
+                label: "Weight (lbs)",
+                data: weightHistory.map(w => w.weight),
+                borderColor: "#2563eb",
+                backgroundColor: "rgba(37, 99, 235, 0.2)",
+                borderWidth: 2,
+                tension: 0.3
+            }]
+        }
+    });
 }
 
 
