@@ -6,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Witness My Fitness</title>
     <link rel="stylesheet" href="style.css">
-
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -34,13 +32,10 @@
             <li>Training Log</li>
             <li>Workout Plan</li>
             <li>Profile</li>
+        </ul>
 
-            <!-- Account Settings with gear icon -->
-            <li id="accountSettingsNav">
-                <span style="display:flex; align-items:center; gap:8px;">
-                    <span class="gear-icon">⚙️</span> Account Settings
-                </span>
-            </li>
+        <ul class="nav-bottom">
+              <li><span class="gear-icon">⚙️</span> Account Settings</li>
         </ul>
     </aside>
 
@@ -131,7 +126,7 @@
             <input type="date" id="editDate">
 
             <label>Exercise Type:</label>
-            <select id="editType">
+            <select id="editType" disabled>
                 <option value="running">Running</option>
                 <option value="walking">Walking</option>
                 <option value="cycling">Cycling</option>
@@ -151,7 +146,7 @@
         </div>
     </div>
 
-    <!-- UPDATE WEIGHT MODAL -->
+    <!-- UPDATE WEIGHT MODAL (not currently used, but kept) -->
     <div id="weightModal" class="modal">
         <div class="modal-content">
             <h2>Update Weight</h2>
