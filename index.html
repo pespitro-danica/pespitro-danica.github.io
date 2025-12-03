@@ -1,66 +1,107 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" conent="width=device-width, initial-scale=1.0">
-    <title>Fitness Tracker</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Tracker</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-      <h1>Fitness Tracker</h1>
-      <p><Hi, welcome to the Fitness Tracker Website./p>
-      <ul><a href="https://github.com/pespitro-danica/pespitro-danica.github.io">Link for Github</a></ul>
-
+  <header>
+    <h1>🏋️‍♂️ Fitness Activity Tracker</h1>
   </header>
 
   <main>
-      <section class="tracker-form">
-        <h2>Add Workout</h2>
-        <form id="workoutform">
-            <label for="type">Exercise Type:</label>
-            <input type="text" id="type" placeholder="Running" required>
+    <section class="form-section">
+      <h2>Add New Activity</h2>
+      <form id="activityForm">
+        <label for="date">Date:</label>
+        <input type="date" id="date" required>
 
-            <label for="duration">Duration (mins):</label>
-            <input type="number" id="duration" placeholder="30" required>
+        <label for="type">Activity Type:</label>
+        <input type="text" id="type" placeholder="e.g. Running" required>
 
-            <label for="calories">Calories Burned:</label>
-            <input type="number" id="calories" placeholder="250" required>
+        <label for="duration">Duration (minutes):</label>
+        <input type="number" id="duration" placeholder="e.g. 30" required>
 
-            <button type="submit">Add Workout</button>
-        </form>
-    </section
-
-    <sectiom class="tracker-list">
-        <h2>Workout Log</h2>
-        <ul id="workoutlist"></u>
+        <button type="submit">Add Activity</button>
+      </form>
     </section>
 
+    <section class="summary-section">
+      <h2>Activity Summary</h2>
+      <table id="activityTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Duration</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
   </main>
 
   <footer>
-        <p>2025 Fitness Tracker by Danica Pespitro</p>
+    <p>© 2025 Fitness Tracker | All rights reserved.</p>
   </footer>
 
   <script>
-        const form = document.getElementById('workoutForm');
-        const list = document.getElementById('workoutList');
+    const form = document.getElementById('activityForm');
+    const tableBody = document.querySelector('#activityTable tbody');
+    let activities = JSON.parse(localStorage.getItem('activities')) || [];
 
-        form.addEventListener('submit', function(event) {
-              event.preventDefault();
+    function renderTable() {
+      tableBody.innerHTML = '';
+      activities.forEach((activity, index) => {
+        const row = document.createElement('tr');
 
-              const type = document.getElementById('type').value;
-              const duration = document.getElementById('duration').value;
-              const calories = document.getElementById('calories').value;
+        row.innerHTML = `
+          <td>${activity.date}</td>
+          <td>${activity.type}</td>
+          <td>${activity.duration}</td>
+          <td>
+            <button class="edit" onclick="editActivity(${index})">✏️ Edit</button>
+            <button class="delete" onclick="deleteActivity(${index})">🗑️ Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
 
-              const listItem = document.createElement('li');
-              listItem.textContent = `${type} - ${duration} mins - ${calories} kcal`;
-              list.appendChild(listItem);
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const date = document.getElementById('date').value;
+      const type = document.getElementById('type').value;
+      const duration = document.getElementById('duration').value;
 
-              form.reset();
-              
-        });
+      activities.push({ date, type, duration });
+      localStorage.setItem('activities', JSON.stringify(activities));
+      form.reset();
+      renderTable();
+    });
+
+    function editActivity(index) {
+      const activity = activities[index];
+      document.getElementById('date').value = activity.date;
+      document.getElementById('type').value = activity.type;
+      document.getElementById('duration').value = activity.duration;
+      activities.splice(index, 1);
+      localStorage.setItem('activities', JSON.stringify(activities));
+      renderTable();
+    }
+
+    function deleteActivity(index) {
+      if (confirm('Delete this activity?')) {
+        activities.splice(index, 1);
+        localStorage.setItem('activities', JSON.stringify(activities));
+        renderTable();
+      }
+    }
+
+    renderTable();
   </script>
-
 </body>
 </html>
