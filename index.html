@@ -1,66 +1,119 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" conent="width=device-width, initial-scale=1.0">
-    <title>Fitness Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track My Glow</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
+    <!-- HEADER -->
     <header>
-      <h1>Fitness Tracker</h1>
-      <p><Hi, welcome to the Fitness Tracker Website./p>
-      <ul><a href="https://github.com/pespitro-danica/pespitro-danica.github.io">Link for Github</a></ul>
+        <h1 class="logo">Track My Glow</h1>
 
-  </header>
+        <div id="header-right">
+            <button id="loginBtn" class="header-btn">Login</button>
+            <button id="createBtn" class="header-btn">Create Account</button>
 
-  <main>
-      <section class="tracker-form">
-        <h2>Add Workout</h2>
-        <form id="workoutform">
-            <label for="type">Exercise Type:</label>
-            <input type="text" id="type" placeholder="Running" required>
+            <span id="welcomeMsg" style="display: none;">Hi, User</span>
+            <button id="logoutBtn" class="header-btn" style="display: none;">Logout</button>
+        </div>
+    </header>
 
-            <label for="duration">Duration (mins):</label>
-            <input type="number" id="duration" placeholder="30" required>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <ul>
+            <li>Dashboard</li>
+            <li>Progress</li>
+            <li>Training Log</li>
+            <li>Workout Plan</li>
+        </ul>
+    </aside>
 
-            <label for="calories">Calories Burned:</label>
-            <input type="number" id="calories" placeholder="250" required>
+    <!-- MAIN CONTENT -->
+    <main id="content">
+        <h2>Dashboard</h2>
+        <p>Here is your fitness summary. (We will add charts and stats later!)</p>
+    </main>
 
-            <button type="submit">Add Workout</button>
-        </form>
-    </section
+    <!-- ACCOUNT CREATION MODAL -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <h2>Create Account</h2>
 
-    <sectiom class="tracker-list">
-        <h2>Workout Log</h2>
-        <ul id="workoutlist"></u>
-    </section>
+            <label>Name:</label>
+            <input type="text" id="regName">
 
-  </main>
+            <label>Email:</label>
+            <input type="email" id="regEmail">
 
-  <footer>
-        <p>2025 Fitness Tracker by Danica Pespitro</p>
-  </footer>
+            <label>Password:</label>
+            <input type="password" id="regPassword">
 
-  <script>
-        const form = document.getElementById('workoutForm');
-        const list = document.getElementById('workoutList');
+            <button id="createAccountSubmit">Create Account</button>
+            <button class="closeModal">Cancel</button>
+        </div>
+    </div>
 
-        form.addEventListener('submit', function(event) {
-              event.preventDefault();
+    <!-- GOAL SELECTION MODAL -->
+    <div id="goalModal" class="modal">
+        <div class="modal-content">
+            <h2>Select Your Fitness Goal</h2>
 
-              const type = document.getElementById('type').value;
-              const duration = document.getElementById('duration').value;
-              const calories = document.getElementById('calories').value;
+            <select id="goalSelect">
+                <option value="lose">Lose Weight</option>
+                <option value="maintain">Maintain Weight</option>
+                <option value="gain">Gain Weight</option>
+                <option value="muscle">Gain Muscle</option>
+            </select>
 
-              const listItem = document.createElement('li');
-              listItem.textContent = `${type} - ${duration} mins - ${calories} kcal`;
-              list.appendChild(listItem);
+            <button id="goalNext">Next</button>
+        </div>
+    </div>
 
-              form.reset();
-              
-        });
-  </script>
+    <!-- STATS INPUT MODAL -->
+    <div id="statsModal" class="modal">
+        <div class="modal-content">
+            <h2>Your Stats</h2>
+
+            <label>Height:</label>
+            <div style="display: flex; gap: 8px;">
+                <input type="number" id="userHeightFeet" placeholder="Feet">
+                <input type="number" id="userHeightInches" placeholder="Inches">
+            </div>
+
+            <label>Weight (lbs):</label>
+            <input type="number" id="userWeightLbs">
+
+            <label>Age:</label>
+            <input type="number" id="userAge">
+
+            <button id="finishSetup">Finish Setup</button>
+        </div>
+    </div>
+
+
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2>Login</h2>
+
+            <label>Email:</label>
+            <input type="email" id="loginEmail">
+
+            <label>Password:</label>
+            <input type="password" id="loginPassword">
+
+            <button id="loginSubmit">Log In</button>
+            <button class="closeLoginModal">Cancel</button>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT FILE -->
+    <script src="script.js"></script>
 
 </body>
 </html>
