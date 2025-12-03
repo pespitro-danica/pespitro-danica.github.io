@@ -1,107 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fitness Tracker</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track My Glow</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <header>
-    <h1>🏋️‍♂️ Fitness Activity Tracker</h1>
-  </header>
 
-  <main>
-    <section class="form-section">
-      <h2>Add New Activity</h2>
-      <form id="activityForm">
-        <label for="date">Date:</label>
-        <input type="date" id="date" required>
+    <!-- HEADER -->
+    <header>
+        <h1 class="logo">Track My Glow</h1>
 
-        <label for="type">Activity Type:</label>
-        <input type="text" id="type" placeholder="e.g. Running" required>
+        <div id="header-right">
+            <button id="loginBtn" class="header-btn">Login</button>
+            <button id="createBtn" class="header-btn">Create Account</button>
 
-        <label for="duration">Duration (minutes):</label>
-        <input type="number" id="duration" placeholder="e.g. 30" required>
+            <span id="welcomeMsg" style="display: none;">Hi, User</span>
+            <button id="logoutBtn" class="header-btn" style="display: none;">Logout</button>
+        </div>
+    </header>
 
-        <button type="submit">Add Activity</button>
-      </form>
-    </section>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <ul>
+            <li>Dashboard</li>
+            <li>Progress</li>
+            <li>Training Log</li>
+            <li>Workout Plan</li>
+        </ul>
+    </aside>
 
-    <section class="summary-section">
-      <h2>Activity Summary</h2>
-      <table id="activityTable">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Duration</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-  </main>
+    <!-- MAIN CONTENT -->
+    <main id="content">
+        <h2>Dashboard</h2>
+        <p>Here is your fitness summary. (We will add charts and stats later!)</p>
+    </main>
 
-  <footer>
-    <p>© 2025 Fitness Tracker | All rights reserved.</p>
-  </footer>
+    <!-- ACCOUNT CREATION MODAL -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <h2>Create Account</h2>
 
-  <script>
-    const form = document.getElementById('activityForm');
-    const tableBody = document.querySelector('#activityTable tbody');
-    let activities = JSON.parse(localStorage.getItem('activities')) || [];
+            <label>Name:</label>
+            <input type="text" id="regName">
 
-    function renderTable() {
-      tableBody.innerHTML = '';
-      activities.forEach((activity, index) => {
-        const row = document.createElement('tr');
+            <label>Email:</label>
+            <input type="email" id="regEmail">
 
-        row.innerHTML = `
-          <td>${activity.date}</td>
-          <td>${activity.type}</td>
-          <td>${activity.duration}</td>
-          <td>
-            <button class="edit" onclick="editActivity(${index})">✏️ Edit</button>
-            <button class="delete" onclick="deleteActivity(${index})">🗑️ Delete</button>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
+            <label>Password:</label>
+            <input type="password" id="regPassword">
 
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const date = document.getElementById('date').value;
-      const type = document.getElementById('type').value;
-      const duration = document.getElementById('duration').value;
+            <button id="createAccountSubmit">Create Account</button>
+            <button class="closeModal">Cancel</button>
+        </div>
+    </div>
 
-      activities.push({ date, type, duration });
-      localStorage.setItem('activities', JSON.stringify(activities));
-      form.reset();
-      renderTable();
-    });
+    <!-- GOAL SELECTION MODAL -->
+    <div id="goalModal" class="modal">
+        <div class="modal-content">
+            <h2>Select Your Fitness Goal</h2>
 
-    function editActivity(index) {
-      const activity = activities[index];
-      document.getElementById('date').value = activity.date;
-      document.getElementById('type').value = activity.type;
-      document.getElementById('duration').value = activity.duration;
-      activities.splice(index, 1);
-      localStorage.setItem('activities', JSON.stringify(activities));
-      renderTable();
-    }
+            <select id="goalSelect">
+                <option value="lose">Lose Weight</option>
+                <option value="maintain">Maintain Weight</option>
+                <option value="gain">Gain Weight</option>
+                <option value="muscle">Gain Muscle</option>
+            </select>
 
-    function deleteActivity(index) {
-      if (confirm('Delete this activity?')) {
-        activities.splice(index, 1);
-        localStorage.setItem('activities', JSON.stringify(activities));
-        renderTable();
-      }
-    }
+            <button id="goalNext">Next</button>
+        </div>
+    </div>
 
-    renderTable();
-  </script>
+    <!-- STATS INPUT MODAL -->
+    <div id="statsModal" class="modal">
+        <div class="modal-content">
+            <h2>Your Stats</h2>
+
+            <label>Height:</label>
+            <div style="display: flex; gap: 8px;">
+                <input type="number" id="userHeightFeet" placeholder="Feet">
+                <input type="number" id="userHeightInches" placeholder="Inches">
+            </div>
+
+            <label>Weight (lbs):</label>
+            <input type="number" id="userWeightLbs">
+
+            <label>Age:</label>
+            <input type="number" id="userAge">
+
+            <button id="finishSetup">Finish Setup</button>
+        </div>
+    </div>
+
+
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2>Login</h2>
+
+            <label>Email:</label>
+            <input type="email" id="loginEmail">
+
+            <label>Password:</label>
+            <input type="password" id="loginPassword">
+
+            <button id="loginSubmit">Log In</button>
+            <button class="closeLoginModal">Cancel</button>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT FILE -->
+    <script src="script.js"></script>
+
 </body>
 </html>
