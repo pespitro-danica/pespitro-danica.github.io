@@ -86,9 +86,10 @@ finishSetup.onclick = () => {
     const feet = document.getElementById("userHeightFeet").value;
     const inches = document.getElementById("userHeightInches").value;
     const weight = document.getElementById("userWeightLbs").value;
+    const weightGoal = document.getElementById("regWeightGoal").value;
     const age = document.getElementById("userAge").value;
 
-    if (!feet || !inches || !weight || !age) {
+    if (!feet || !inches || !weight || !weightGoal || !age) {
         alert("All fields required!");
         return;
     }
@@ -99,7 +100,15 @@ finishSetup.onclick = () => {
     localStorage.setItem("userHeightInches", inches);
     localStorage.setItem("userHeightTotalInches", totalInches);
     localStorage.setItem("userWeightLbs", weight);
+    localStorage.setItem("userWeightGoal", weightGoal);
     localStorage.setItem("userAge", age);
+
+    // Initialize weight history with first weight
+    const firstEntry = [{
+        date: new Date().toISOString().split("T")[0],
+        weight: Number(weight)
+    }];
+    localStorage.setItem("weightHistory", JSON.stringify(firstEntry));
 
     statsModal.style.display = "none";
     showWelcome();
@@ -160,7 +169,7 @@ logoutBtn.onclick = () => {
 
 
 // ---------------------------------------
-// SIDEBAR NAV
+// SIDEBAR NAVIGATION
 // ---------------------------------------
 navItems.forEach(item => {
     item.addEventListener("click", () => {
@@ -185,7 +194,7 @@ navItems.forEach(item => {
 
 function highlightDashboard() {
     removeAllHighlights();
-    if (navItems[0]) navItems[0].classList.add("active");
+    navItems[0].classList.add("active");
 }
 
 function removeAllHighlights() {
@@ -201,7 +210,7 @@ function loadPage(page) {
     if (!userIsLoggedIn() && page !== "Welcome") {
         content.innerHTML = `
             <h2>Welcome!</h2>
-            <p>Please login or create an account to continue.</p>
+            <p>Please login or create an account to start your journey.</p>
         `;
         return;
     }
@@ -230,7 +239,6 @@ function loadPage(page) {
         let weeklyMiles = 0;
 
         workouts.forEach(w => {
-            if (!w.date) return;
             const wDate = new Date(w.date);
             if (wDate >= oneWeekAgo) {
                 weeklyCount++;
@@ -239,21 +247,19 @@ function loadPage(page) {
             }
         });
 
-        const weight = Number(localStorage.getItem("userWeightLbs"));
+        const weightCurr = Number(localStorage.getItem("userWeightLbs"));
         const weightGoal = Number(localStorage.getItem("userWeightGoal"));
-        let weightMsg = "";
+        const diff = weightCurr - weightGoal;
 
-        if (weightGoal) {
-            const diff = weightGoal - weight;
-            if (!weight) {
-                weightMsg = "Update your current weight in Profile.";
-            } else if (diff > 0) {
-                weightMsg = `You are ${diff} lbs away from your goal.`;
-            } else if (diff < 0) {
-                weightMsg = `You passed your goal by ${Math.abs(diff)} lbs.`;
-            } else {
-                weightMsg = `You reached your goal weight! 🎉`;
-            }
+        let weightMsg = "";
+        if (!weightGoal) {
+            weightMsg = "Set your goal in Profile.";
+        } else if (diff > 0) {
+            weightMsg = `${diff} lbs above goal`;
+        } else if (diff < 0) {
+            weightMsg = `${Math.abs(diff)} lbs below goal`;
+        } else {
+            weightMsg = "Goal reached!";
         }
 
         content.innerHTML = `
@@ -281,8 +287,8 @@ function loadPage(page) {
 
                 <div class="card">
                     <h3>Weight Goal</h3>
-                    <p class="card-number">${weightGoal ? weightGoal + " lbs" : "Not set"}</p>
-                    <span>${weightGoal ? weightMsg : "Set your goal in Profile."}</span>
+                    <p class="card-number">${weightGoal || "Not set"}</p>
+                    <span>${weightMsg}</span>
                 </div>
             </div>
 
@@ -301,7 +307,6 @@ function loadPage(page) {
             }
         `;
     }
-
 
     // ---------- TRAINING LOG ----------
     if (page === "Training Log") {
@@ -353,7 +358,6 @@ function loadPage(page) {
         loadWorkouts();
     }
 
-
     // ---------- PROGRESS ----------
     if (page === "Progress") {
         content.innerHTML = `
@@ -368,8 +372,61 @@ function loadPage(page) {
 
         generateCharts();
         generateWeightChart();
-    }
 
+        // Weight Summary + Table
+        const weight = Number(localStorage.getItem("userWeightLbs"));
+        const goal = Number(localStorage.getItem("userWeightGoal"));
+        const history = JSON.parse(localStorage.getItem("weightHistory")) || [];
+
+        const startWeight = history.length ? history[0].weight : weight;
+        const diff = weight - goal;
+
+        let diffMsg = "";
+        if (diff > 0) diffMsg = `${diff} lbs above goal`;
+        else if (diff < 0) diffMsg = `${Math.abs(diff)} lbs below goal`;
+        else diffMsg = "Goal reached!";
+
+        content.innerHTML += `
+            <div class="plan-box" style="margin-top:20px;">
+                <h4>Weight Summary</h4>
+                <p><strong>Start Weight:</strong> ${startWeight} lbs</p>
+                <p><strong>Current Weight:</strong> ${weight} lbs</p>
+                <p><strong>Goal Weight:</strong> ${goal} lbs</p>
+                <p><strong>Difference:</strong> ${diffMsg}</p>
+            </div>
+
+            <h3 style="margin-top:30px;">Weight Log</h3>
+            <table class="workout-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Weight</th>
+                        <th>Difference from Goal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${
+                        history.map(h => {
+                            const d = h.weight - goal;
+                            return `
+                                <tr>
+                                    <td>${h.date}</td>
+                                    <td>${h.weight}</td>
+                                    <td>${
+                                        d > 0
+                                        ? d + " above goal"
+                                        : d < 0
+                                            ? Math.abs(d) + " below goal"
+                                            : "at goal"
+                                    }</td>
+                                </tr>
+                            `;
+                        }).join("")
+                    }
+                </tbody>
+            </table>
+        `;
+    }
 
     // ---------- WORKOUT PLAN ----------
     if (page === "Workout Plan") {
@@ -380,40 +437,48 @@ function loadPage(page) {
             plan = `
                 <h3>Weight Loss Plan</h3>
                 <ul>
-                    <li>4× Cardio (20–30 minutes each)</li>
-                    <li>2× Bodyweight strength sessions</li>
-                    <li>Daily steps: 7,000–10,000</li>
+                    <li>4× Cardio (20–30 minutes)</li>
+                    <li>2× Strength sessions</li>
+                    <li>7k–10k daily steps</li>
                 </ul>
             `;
-        } else if (goal === "maintain") {
+        }
+
+        else if (goal === "maintain") {
             plan = `
                 <h3>Maintenance Plan</h3>
                 <ul>
-                    <li>2× Cardio sessions</li>
-                    <li>2× Light strength sessions</li>
-                    <li>1× Active recovery day</li>
+                    <li>2× Cardio</li>
+                    <li>2× Light strength days</li>
+                    <li>1× Active recovery</li>
                 </ul>
             `;
-        } else if (goal === "gain") {
+        }
+
+        else if (goal === "gain") {
             plan = `
                 <h3>Weight Gain Plan</h3>
                 <ul>
                     <li>3× Strength training</li>
                     <li>1× Light cardio</li>
-                    <li>Eat 200–300 extra calories</li>
+                    <li>+200–300 calories per day</li>
                 </ul>
             `;
-        } else if (goal === "muscle") {
+        }
+
+        else if (goal === "muscle") {
             plan = `
                 <h3>Muscle Building Plan</h3>
                 <ul>
                     <li>4× Strength Split (Upper/Lower/Push/Pull)</li>
-                    <li>1–2× Low-intensity cardio</li>
-                    <li>Progressive overload weekly</li>
+                    <li>1× Low-intensity cardio</li>
+                    <li>Progressive overload</li>
                 </ul>
             `;
-        } else {
-            plan = `<p>No goal set. Go to Profile to set one.</p>`;
+        }
+
+        else {
+            plan = `<p>No goal set. Update in Profile.</p>`;
         }
 
         content.innerHTML = `
@@ -421,7 +486,6 @@ function loadPage(page) {
             <div class="plan-box">${plan}</div>
         `;
     }
-
 
     // ---------- PROFILE ----------
     if (page === "Profile") {
@@ -481,7 +545,6 @@ function loadPage(page) {
             </div>
         `;
 
-        // Buttons
         document.getElementById("editProfileBtn").onclick = () => {
             document.getElementById("profileView").style.display = "none";
             document.getElementById("profileEdit").style.display = "block";
@@ -495,7 +558,6 @@ function loadPage(page) {
             weightModal.style.display = "block";
         };
     }
-
 
     // ---------- ACCOUNT SETTINGS ----------
     if (page === "Account Settings") {
@@ -528,7 +590,9 @@ function saveProfileChanges() {
     localStorage.setItem("userHeightInches", document.getElementById("profileHeightInches").value);
     localStorage.setItem("userAge", document.getElementById("profileAge").value);
     localStorage.setItem("userGoal", document.getElementById("profileGoal").value);
-    localStorage.setItem("userWeightGoal", document.getElementById("profileWeightGoal").value);
+
+    const newGoal = document.getElementById("profileWeightGoal").value;
+    if (newGoal) localStorage.setItem("userWeightGoal", newGoal);
 
     const newWeight = document.getElementById("profileWeight").value;
     localStorage.setItem("userWeightLbs", newWeight);
@@ -809,7 +873,7 @@ function deleteWorkout(i) {
 
 
 // ---------------------------------------
-// EDIT WORKOUT – OPEN
+// EDIT WORKOUT – OPEN MODAL
 // ---------------------------------------
 function openEditModal(i) {
     const workouts = JSON.parse(localStorage.getItem("workouts")) || [];
@@ -834,7 +898,7 @@ function openEditModal(i) {
 
 
 // ---------------------------------------
-// EDIT WORKOUT – RENDER FIELDS
+// RENDER CONDITIONAL FIELDS FOR EDIT
 // ---------------------------------------
 function renderEditConditionalFields(type, w) {
     const container = document.getElementById("editConditionalFields");
@@ -851,20 +915,20 @@ function renderEditConditionalFields(type, w) {
 
     if (type === "lifting") {
         container.innerHTML = `
-            <label>Exercise Name:</label>
+            <label>Exercise:</label>
             <input type="text" id="editLiftName" value="${w.liftName || ""}">
             <label>Sets:</label>
             <input type="number" id="editSets" value="${w.sets || ""}">
             <label>Reps:</label>
             <input type="number" id="editReps" value="${w.reps || ""}">
-            <label>Weight (lbs):</label>
+            <label>Weight:</label>
             <input type="number" id="editLiftWeight" value="${w.weight || ""}">
         `;
     }
 
     if (type === "bodyweight") {
         container.innerHTML = `
-            <label>Exercise Name:</label>
+            <label>Exercise:</label>
             <input type="text" id="editBwName" value="${w.bwName || ""}">
             <label>Sets:</label>
             <input type="number" id="editBwSets" value="${w.bwSets || ""}">
@@ -881,7 +945,7 @@ function renderEditConditionalFields(type, w) {
 
     if (type === "yoga") {
         container.innerHTML = `
-            <label>Session Type:</label>
+            <label>Session:</label>
             <input type="text" id="editYogaType" value="${w.yogaType || ""}">
             <label>Difficulty:</label>
             <select id="editDifficulty">
@@ -894,7 +958,7 @@ function renderEditConditionalFields(type, w) {
 
     if (type === "pilates") {
         container.innerHTML = `
-            <label>Class Type:</label>
+            <label>Class:</label>
             <input type="text" id="editPilatesType" value="${w.pilatesType || ""}">
             <label>Intensity:</label>
             <select id="editPilatesIntensity">
@@ -908,12 +972,10 @@ function renderEditConditionalFields(type, w) {
 
 
 // ---------------------------------------
-// EDIT WORKOUT – SAVE
+// SAVE EDITED WORKOUT
 // ---------------------------------------
 function saveWorkoutEdit() {
     const workouts = JSON.parse(localStorage.getItem("workouts")) || [];
-    const old = workouts[currentEditIndex];
-
     const type = document.getElementById("editType").value;
 
     const updated = {
@@ -930,7 +992,7 @@ function saveWorkoutEdit() {
         const dist = document.getElementById("editDistance");
 
         if (!dur.value) {
-            alert("Duration required for this exercise.");
+            alert("Duration required.");
             return;
         }
 
@@ -970,7 +1032,6 @@ function saveWorkoutEdit() {
 
     alert("Workout updated!");
     editModal.style.display = "none";
-    currentEditIndex = null;
     loadPage("Training Log");
 }
 
@@ -996,7 +1057,6 @@ function generateCharts() {
     }
 
     workouts.forEach(w => {
-        if (!w.date) return;
         const entry = last7.find(d => d.dateString === w.date);
         if (entry) {
             entry.workouts++;
@@ -1060,7 +1120,7 @@ function generateWeightChart() {
 
 
 // ---------------------------------------
-// INITIAL PAGE LOAD
+// FINAL INITIAL LOAD
 // ---------------------------------------
 if (userIsLoggedIn()) {
     highlightDashboard();
