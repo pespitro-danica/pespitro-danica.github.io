@@ -151,19 +151,50 @@ closeBtns.forEach(btn => {
     };
 });
 
+/* ---------- APP INIT ON PAGE LOAD ---------- */
+function initializeApp() {
+    const isLoggedIn = localStorage.getItem("loggedIn") === "true";
+    const savedUser = localStorage.getItem("loggedInUser");
 
-if (!localStorage.getItem("loggedIn") || !localStorage.getItem("loggedInUser")) {
-    document.querySelectorAll(".sidebar li").forEach(item => {
-        item.style.pointerEvents = "none";
-        item.style.opacity = "0.5";
-    });
-} else {
-    // Enable sidebar if user is logged in and active
-    document.querySelectorAll(".sidebar li").forEach(item => {
-        item.style.pointerEvents = "auto";
-        item.style.opacity = "1";
-    });
+    if (isLoggedIn && savedUser) {
+        // Restore current user
+        currentUser = savedUser;
+
+        // Header UI: show welcome + logout, hide login/create
+        showWelcome();
+
+        // Enable sidebar
+        document.querySelectorAll(".sidebar li").forEach(item => {
+            item.style.pointerEvents = "auto";
+            item.style.opacity = "1";
+        });
+
+        // Load their dashboard instead of welcome screen
+        loadPage("Dashboard");
+    } else {
+        // Treat as logged out
+        currentUser = "";
+
+        // Header UI: hide welcome, show login/create
+        welcomeMsg.style.display = "none";
+        loginBtn.style.display = "inline";
+        createBtn.style.display = "inline";
+        logoutBtn.style.display = "none";
+
+        // Disable sidebar
+        document.querySelectorAll(".sidebar li").forEach(item => {
+            item.style.pointerEvents = "none";
+            item.style.opacity = "0.5";
+        });
+
+        // Show welcome screen
+        loadPageWelcome();
+    }
 }
+
+// Run this once when the script loads
+initializeApp();
+
 
 /* ---------- CREATE ACCOUNT: STEP 1 ---------- */
 createAccountSubmit.onclick = () => {
@@ -339,7 +370,6 @@ function loadPageWelcome() {
         <p>Please log in or create an account to begin tracking your fitness journey.</p>
     `;
 }
-loadPageWelcome();
 
 /* ---------------------------
    MAIN PAGE LOADER
