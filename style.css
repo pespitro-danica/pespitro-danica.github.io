@@ -255,3 +255,11 @@ button {
     box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     max-width: 600px;
 }
+
+.chart-box {
+    background: #eef3ff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}

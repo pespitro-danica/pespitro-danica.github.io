@@ -359,74 +359,85 @@ function loadPage(page) {
     }
 
     // ---------- PROGRESS ----------
-    if (page === "Progress") {
-        content.innerHTML = `
-            <h2>Progress</h2>
+    // ---------- PROGRESS ----------
+if (page === "Progress") {
+    content.innerHTML = `
+        <h2>Progress</h2>
 
+        <div class="chart-box">
             <canvas id="weeklyWorkoutsChart"></canvas>
-            <canvas id="weeklyDistanceChart" style="margin-top: 40px;"></canvas>
+        </div>
 
-            <h3 style="margin-top: 40px;">Weight Progress</h3>
+        <div class="chart-box">
+            <canvas id="weeklyDistanceChart"></canvas>
+        </div>
+
+        <div class="chart-box">
             <canvas id="weightProgressChart" height="120"></canvas>
-        `;
+        </div>
+    `;
 
+    // Delay so DOM finishes drawing <canvas>
+    setTimeout(() => {
         generateCharts();
         generateWeightChart();
+    }, 20);
 
-        // Weight Summary + Table
-        const weight = Number(localStorage.getItem("userWeightLbs"));
-        const goal = Number(localStorage.getItem("userWeightGoal"));
-        const history = JSON.parse(localStorage.getItem("weightHistory")) || [];
+    // Weight Summary
+    const weight = Number(localStorage.getItem("userWeightLbs"));
+    const goal = Number(localStorage.getItem("userWeightGoal"));
+    const history = JSON.parse(localStorage.getItem("weightHistory")) || [];
 
-        const startWeight = history.length ? history[0].weight : weight;
-        const diff = weight - goal;
+    const startWeight = history.length ? history[0].weight : weight;
+    const diff = weight - goal;
 
-        let diffMsg = "";
-        if (diff > 0) diffMsg = `${diff} lbs above goal`;
-        else if (diff < 0) diffMsg = `${Math.abs(diff)} lbs below goal`;
-        else diffMsg = "Goal reached!";
+    let diffMsg = "";
+    if (diff > 0) diffMsg = `${diff} lbs above goal`;
+    else if (diff < 0) diffMsg = `${Math.abs(diff)} lbs below goal`;
+    else diffMsg = "Goal reached!";
 
-        content.innerHTML += `
-            <div class="plan-box" style="margin-top:20px;">
-                <h4>Weight Summary</h4>
-                <p><strong>Start Weight:</strong> ${startWeight} lbs</p>
-                <p><strong>Current Weight:</strong> ${weight} lbs</p>
-                <p><strong>Goal Weight:</strong> ${goal} lbs</p>
-                <p><strong>Difference:</strong> ${diffMsg}</p>
-            </div>
+    content.innerHTML += `
+        <div class="plan-box" style="margin-top:20px;">
+            <h4>Weight Summary</h4>
+            <p><strong>Start Weight:</strong> ${startWeight} lbs</p>
+            <p><strong>Current Weight:</strong> ${weight} lbs</p>
+            <p><strong>Goal Weight:</strong> ${goal} lbs</p>
+            <p><strong>Difference:</strong> ${diffMsg}</p>
+        </div>
 
-            <h3 style="margin-top:30px;">Weight Log</h3>
-            <table class="workout-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Weight</th>
-                        <th>Difference from Goal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${
-                        history.map(h => {
-                            const d = h.weight - goal;
-                            return `
-                                <tr>
-                                    <td>${h.date}</td>
-                                    <td>${h.weight}</td>
-                                    <td>${
-                                        d > 0
-                                        ? d + " above goal"
-                                        : d < 0
-                                            ? Math.abs(d) + " below goal"
-                                            : "at goal"
-                                    }</td>
-                                </tr>
-                            `;
-                        }).join("")
-                    }
-                </tbody>
-            </table>
-        `;
-    }
+        <h3 style="margin-top:30px;">Weight Log</h3>
+        <table class="workout-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Weight</th>
+                    <th>Difference from Goal</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${
+                    history.map(h => {
+                        const d = h.weight - goal;
+                        return `
+                            <tr>
+                                <td>${h.date}</td>
+                                <td>${h.weight}</td>
+                                <td>${
+                                    d > 0
+                                    ? d + " above goal"
+                                    : d < 0
+                                        ? Math.abs(d) + " below goal"
+                                        : "at goal"
+                                }</td>
+                            </tr>
+                        `;
+                    }).join("")
+                }
+            </tbody>
+        </table>
+    `;
+}
+
 
     // ---------- WORKOUT PLAN ----------
     if (page === "Workout Plan") {
@@ -438,7 +449,7 @@ function loadPage(page) {
                 <h3>Weight Loss Plan</h3>
                 <ul>
                     <li>4× Cardio (20–30 minutes)</li>
-                    <li>2× Strength sessions</li>
+                    <li>3-4× Strength sessions</li>
                     <li>7k–10k daily steps</li>
                 </ul>
             `;
