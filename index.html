@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track My Glow</title>
+    <title>Witness My Fitness</title>
     <link rel="stylesheet" href="style.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
     <!-- HEADER -->
     <header>
-        <h1 class="logo">Track My Glow</h1>
+        <h1 class="logo">Witness My Fitness</h1>
 
         <div id="header-right">
             <button id="loginBtn" class="header-btn">Login</button>
             <button id="createBtn" class="header-btn">Create Account</button>
 
-            <span id="welcomeMsg" style="display: none;">Hi, User</span>
-            <button id="logoutBtn" class="header-btn" style="display: none;">Logout</button>
+            <span id="welcomeMsg" style="display:none;">Hi, User</span>
+            <button id="logoutBtn" class="header-btn" style="display:none;">Logout</button>
         </div>
     </header>
 
@@ -29,16 +33,37 @@
             <li>Progress</li>
             <li>Training Log</li>
             <li>Workout Plan</li>
+            <li>Profile</li>
+
+            <!-- Account Settings with gear icon -->
+            <li id="accountSettingsNav">
+                <span style="display:flex; align-items:center; gap:8px;">
+                    <span class="gear-icon">⚙️</span> Account Settings
+                </span>
+            </li>
         </ul>
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main id="content">
-        <h2>Dashboard</h2>
-        <p>Here is your fitness summary. (We will add charts and stats later!)</p>
-    </main>
+    <main id="content"></main>
 
-    <!-- ACCOUNT CREATION MODAL -->
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2>Login</h2>
+
+            <label>Email:</label>
+            <input type="email" id="loginEmail">
+
+            <label>Password:</label>
+            <input type="password" id="loginPassword">
+
+            <button id="loginSubmit">Login</button>
+            <button class="closeModal">Cancel</button>
+        </div>
+    </div>
+
+    <!-- CREATE ACCOUNT MODAL -->
     <div id="createModal" class="modal">
         <div class="modal-content">
             <h2>Create Account</h2>
@@ -73,13 +98,13 @@
         </div>
     </div>
 
-    <!-- STATS INPUT MODAL -->
+    <!-- STATS SETUP MODAL -->
     <div id="statsModal" class="modal">
         <div class="modal-content">
             <h2>Your Stats</h2>
 
             <label>Height:</label>
-            <div style="display: flex; gap: 8px;">
+            <div style="display:flex; gap:10px;">
                 <input type="number" id="userHeightFeet" placeholder="Feet">
                 <input type="number" id="userHeightInches" placeholder="Inches">
             </div>
@@ -94,26 +119,49 @@
         </div>
     </div>
 
-
-    <!-- LOGIN MODAL -->
-    <div id="loginModal" class="modal">
+    <!-- EDIT WORKOUT MODAL -->
+    <div id="editModal" class="modal">
         <div class="modal-content">
-            <h2>Login</h2>
+            <h2>Edit Workout</h2>
 
-            <label>Email:</label>
-            <input type="email" id="loginEmail">
+            <label>Date:</label>
+            <input type="date" id="editDate">
 
-            <label>Password:</label>
-            <input type="password" id="loginPassword">
+            <label>Exercise Type:</label>
+            <select id="editType">
+                <option value="running">Running</option>
+                <option value="walking">Walking</option>
+                <option value="cycling">Cycling</option>
+                <option value="lifting">Weight Lifting</option>
+                <option value="bodyweight">Bodyweight Training</option>
+                <option value="yoga">Yoga</option>
+                <option value="pilates">Pilates</option>
+            </select>
 
-            <button id="loginSubmit">Log In</button>
-            <button class="closeLoginModal">Cancel</button>
+            <div id="editConditionalFields"></div>
+
+            <label>Calories:</label>
+            <input type="number" id="editCalories">
+
+            <button id="saveEditBtn">Save Changes</button>
+            <button class="closeModal" id="editClose">Cancel</button>
         </div>
     </div>
 
+    <!-- UPDATE WEIGHT MODAL -->
+    <div id="weightModal" class="modal">
+        <div class="modal-content">
+            <h2>Update Weight</h2>
 
-    <!-- JAVASCRIPT FILE -->
+            <label>New Weight (lbs):</label>
+            <input type="number" id="newWeightInput">
+
+            <button id="saveNewWeightBtn">Save</button>
+            <button class="closeModal">Cancel</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
-
 </body>
+
 </html>
