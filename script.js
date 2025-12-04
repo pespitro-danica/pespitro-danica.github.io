@@ -344,20 +344,21 @@ function showWelcome() {
    SIDEBAR NAVIGATION
 --------------------------- */
 
-navItems.forEach(item => {
-    item.addEventListener("click", () => {
+accountSettingsNav.addEventListener("click", () => {
+    // Prevent navigation if logged out
+    if (!currentUser) {
+        alert("Please log in first.");
+        return;
+    }
 
-      if (!localStorage.getItem(currentUser + "_userName")) {
-            alert("Please log in first.");
-            return;
-      }
+    // Remove active class from other nav items
+    navItems.forEach(i => i.classList.remove("active"));
 
-        navItems.forEach(i => i.classList.remove("active"));
-        item.classList.add("active");
+    // Add active class to Account Settings
+    accountSettingsNav.classList.add("active");
 
-        const page = item.textContent.trim();
-        loadPage(page);
-    });
+    // Load the Account Settings page
+    loadAccountSettings();
 });
 
 /* ---------------------------
