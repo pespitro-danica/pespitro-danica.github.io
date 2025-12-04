@@ -486,3 +486,37 @@ header {
 .weight-progress-row .summary-box {
     flex: 1;
 }
+
+/* ------------------------------------
+   MOBILE RESPONSIVE ADJUSTMENTS
+------------------------------------ */
+@media (max-width: 768px) {
+
+    /* Layout spacing */
+    body {
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Sidebar becomes collapsible style */
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .sidebar ul {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .sidebar li {
+        padding: 12px 18px;
+        font-size: 15px;
+        display: inline-block;
+    }
+
+    /* Header adjusts to full width */
+    header {
+        margin-left:
