@@ -289,6 +289,10 @@ loginSubmit.onclick = () => {
           item.style.pointerEvents = "auto";
         });
 
+        accountSettingsNav.style.pointerEvents = "auto";
+        accountSettingsNav.style.opacity = "1";
+
+
         loginModal.style.display = "none";
         showWelcome();
         loadPage("Dashboard");
@@ -311,6 +315,10 @@ logoutBtn.onclick = () => {
         item.style.pointerEvents = "none";
         item.style.opacity = "0.5";
     });
+
+    accountSettingsNav.style.pointerEvents = "none";
+    accountSettingsNav.style.opacity = "0.5";
+
 
     // Reset header UI
     welcomeMsg.style.display = "none";
@@ -359,6 +367,19 @@ navItems.forEach(item => {
         loadPage(page);
     });
 });
+
+accountSettingsNav.addEventListener("click", () => {
+    if (!localStorage.getItem(currentUser + "_userName")) {
+        alert("Please log in first.");
+        return;
+    }
+
+    navItems.forEach(i => i.classList.remove("active"));
+    accountSettingsNav.classList.add("active");
+
+    loadPage("Account Settings");
+});
+
 
 /* ---------------------------
    INITIAL PAGE FOR LOGGED-OUT USERS
