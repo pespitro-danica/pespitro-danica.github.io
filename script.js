@@ -395,10 +395,7 @@ function loadPageWelcome() {
 --------------------------- */
 
 function loadPage(page) {
-    if (!localStorage.getItem(currentUser + "_userName")) {
-        loadPageWelcome();
-        return;
-    }
+    
 
     if (page === "Dashboard") loadDashboard();
     if (page === "Progress") loadProgress();
