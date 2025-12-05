@@ -386,6 +386,8 @@ function loadPage(page) {
     if (page === "Training Log") loadTrainingLog();
     if (page === "Workout Plan") loadWorkoutPlan();
     if (page === "Profile") loadProfilePage();
+
+    if (page == "Account Settings") loadAccountSettings();
 }
 
 /* ---------------------------
