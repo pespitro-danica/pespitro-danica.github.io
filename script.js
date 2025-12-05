@@ -292,7 +292,6 @@ loginSubmit.onclick = () => {
         accountSettingsNav.style.pointerEvents = "auto";
         accountSettingsNav.style.opacity = "1";
 
-
         loginModal.style.display = "none";
         showWelcome();
         loadPage("Dashboard");
@@ -318,7 +317,6 @@ logoutBtn.onclick = () => {
 
     accountSettingsNav.style.pointerEvents = "none";
     accountSettingsNav.style.opacity = "0.5";
-
 
     // Reset header UI
     welcomeMsg.style.display = "none";
