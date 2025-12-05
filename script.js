@@ -1334,12 +1334,6 @@ function loadWorkoutPlan() {
    ACCOUNT SETTINGS
 --------------------------- */
 
-accountSettingsNav.onclick = () => {
-    navItems.forEach(i => i.classList.remove("active"));
-    accountSettingsNav.classList.add("active");
-    loadAccountSettings();
-};
-
 function loadAccountSettings() {
     const email = localStorage.getItem(currentUser + "_userEmail") || "";
     const password = localStorage.getItem(currentUser + "_userPassword") || "";
