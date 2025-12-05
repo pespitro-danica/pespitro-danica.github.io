@@ -289,9 +289,6 @@ loginSubmit.onclick = () => {
           item.style.pointerEvents = "auto";
         });
 
-        accountSettingsNav.style.pointerEvents = "auto";
-        accountSettingsNav.style.opacity = "1";
-
         loginModal.style.display = "none";
         showWelcome();
         loadPage("Dashboard");
@@ -314,9 +311,6 @@ logoutBtn.onclick = () => {
         item.style.pointerEvents = "none";
         item.style.opacity = "0.5";
     });
-
-    accountSettingsNav.style.pointerEvents = "none";
-    accountSettingsNav.style.opacity = "0.5";
 
     // Reset header UI
     welcomeMsg.style.display = "none";
@@ -366,6 +360,7 @@ navItems.forEach(item => {
     });
 });
 
+/* --- FIX: Account Settings Button Click --- */
 accountSettingsNav.addEventListener("click", () => {
     if (!localStorage.getItem(currentUser + "_userName")) {
         alert("Please log in first.");
@@ -395,14 +390,18 @@ function loadPageWelcome() {
 --------------------------- */
 
 function loadPage(page) {
-    
+    if (!localStorage.getItem(currentUser + "_userName")) {
+        loadPageWelcome();
+        return;
+    }
 
     if (page === "Dashboard") loadDashboard();
     if (page === "Progress") loadProgress();
     if (page === "Training Log") loadTrainingLog();
     if (page === "Workout Plan") loadWorkoutPlan();
     if (page === "Profile") loadProfilePage();
-    if (page === "Account Settings") loadAccountSettings();
+
+    if (page == "Account Settings") loadAccountSettings();
 }
 
 /* ---------------------------
