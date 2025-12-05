@@ -344,21 +344,20 @@ function showWelcome() {
    SIDEBAR NAVIGATION
 --------------------------- */
 
-accountSettingsNav.addEventListener("click", () => {
-    // Prevent navigation if logged out
-    if (!currentUser) {
-        alert("Please log in first.");
-        return;
-    }
+navItems.forEach(item => {
+    item.addEventListener("click", () => {
 
-    // Remove active class from other nav items
-    navItems.forEach(i => i.classList.remove("active"));
+      if (!localStorage.getItem(currentUser + "_userName")) {
+            alert("Please log in first.");
+            return;
+      }
 
-    // Add active class to Account Settings
-    accountSettingsNav.classList.add("active");
+        navItems.forEach(i => i.classList.remove("active"));
+        item.classList.add("active");
 
-    // Load the Account Settings page
-    loadAccountSettings();
+        const page = item.textContent.trim();
+        loadPage(page);
+    });
 });
 
 /* ---------------------------
@@ -387,6 +386,7 @@ function loadPage(page) {
     if (page === "Training Log") loadTrainingLog();
     if (page === "Workout Plan") loadWorkoutPlan();
     if (page === "Profile") loadProfilePage();
+    if (page === "Account Settings") loadAccountSettings();
 }
 
 /* ---------------------------
@@ -1332,12 +1332,6 @@ function loadWorkoutPlan() {
 /* ---------------------------
    ACCOUNT SETTINGS
 --------------------------- */
-
-accountSettingsNav.onclick = () => {
-    navItems.forEach(i => i.classList.remove("active"));
-    accountSettingsNav.classList.add("active");
-    loadAccountSettings();
-};
 
 function loadAccountSettings() {
     const email = localStorage.getItem(currentUser + "_userEmail") || "";
