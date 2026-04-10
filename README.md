@@ -1,10 +1,21 @@
-# Fitness Tracker: Witness My Fitness
-This will be my first intermediate project. It will be a Fitness Tracker that will keep a log of an individuals fitness journey.
+# Witness My Fitness
+A web application for tracking fitness activities, logging workouts, and monitoring progress. It supports user profiles, goal setting, progress charts, and saved data entries using Local Storage.
 
-## Project prompt:
-Web app to log and track fitness activities.
+## Features
+- User login and profile support
+- Log fitness activities by date, workout type, and duration
+- Edit and delete existing workout entries
+- View saved activity history in a summary table
+- Track weekly and monthly totals with charts
+- Set and monitor fitness goals
+- Store user data locally with browser Local Storage
 
-- Basic Features: Activity logging (date, type, duration), summary table, edit/delete entries.
-
-- Enhanced Features: Charts of weekly/monthly totals, goal setting, user profiles.
+# Tools & Concepts
+- HTML
+- CSS
+- JavaScript
+- Local Storage
+- DOM manipulation
+- Data visualization
+- User interaction and data management
 
